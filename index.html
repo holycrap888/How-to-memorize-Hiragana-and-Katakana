@@ -1351,13 +1351,13 @@ function openKanaModal(char, type) {
   document.getElementById('modalMnemonic').textContent = '💡 ' + c.mnemonic;
   document.getElementById('modalExample').textContent = '📝 ' + c.example;
   document.getElementById('kanaModal').classList.add('active');
-  if(state.settings.audio) speakJapanese(c.romaji);
+  if(state.settings.audio) speakCharWithExample(c.char, c.example);
 }
 function closeModal() {
   document.getElementById('kanaModal').classList.remove('active');
 }
 function speakModal() {
-  if(currentModalChar) speakJapanese(currentModalChar.romaji);
+  if(currentModalChar) speakCharWithExample(currentModalChar.char, currentModalChar.example);
 }
 function markModalLearned() {
   if(!currentModalChar) return;
@@ -1376,15 +1376,78 @@ function goWriteChar() {
 // =====================================================
 // SPEECH SYNTHESIS
 // =====================================================
-function speakJapanese(text) {
-  if(!state.settings.audio) return;
-  if(!window.speechSynthesis) return;
+// =====================================================
+// SPEECH SYNTHESIS — ใช้ตัวอักษรญี่ปุ่นจริง ไม่ใช่ romaji
+// =====================================================
+let voices = [];
+function loadVoices() {
+  voices = window.speechSynthesis.getVoices();
+}
+if (window.speechSynthesis) {
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function getJapaneseVoice() {
+  // เลือก voice ภาษาญี่ปุ่นที่ดีที่สุดที่มี
+  const jaVoices = voices.filter(v => v.lang && v.lang.startsWith('ja'));
+  // ลำดับความสำคัญ: Google > Microsoft > native
+  const preferred = jaVoices.find(v => /google/i.test(v.name)) ||
+                    jaVoices.find(v => /microsoft/i.test(v.name)) ||
+                    jaVoices.find(v => v.localService) ||
+                    jaVoices[0] || null;
+  return preferred;
+}
+
+function speakJapanese(japaneseChar) {
+  if (!state.settings.audio) return;
+  if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
+
+  const u = new SpeechSynthesisUtterance(japaneseChar);
   u.lang = 'ja-JP';
-  u.rate = 0.8;
-  u.pitch = 1.1;
+  u.rate = 0.7;   // ช้าลงเพื่อความชัดเจน
+  u.pitch = 1.0;
+  u.volume = 1.0;
+
+  const voice = getJapaneseVoice();
+  if (voice) u.voice = voice;
+
   window.speechSynthesis.speak(u);
+}
+
+// พูดตัวอักษรพร้อม example word เพื่อเสริมความเข้าใจ
+function speakCharWithExample(char, exampleWord) {
+  if (!state.settings.audio) return;
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+
+  const voice = getJapaneseVoice();
+
+  // พูดตัวอักษรก่อน
+  const u1 = new SpeechSynthesisUtterance(char);
+  u1.lang = 'ja-JP';
+  u1.rate = 0.6;
+  u1.pitch = 1.0;
+  u1.volume = 1.0;
+  if (voice) u1.voice = voice;
+
+  window.speechSynthesis.speak(u1);
+
+  // ถ้ามี example word พูดตามหลังจาก 800ms
+  if (exampleWord) {
+    // ดึงแค่ตัวอักษรญี่ปุ่นจาก example string เช่น "あめ (ame) = ฝน" → "あめ"
+    const jpMatch = exampleWord.match(/^([^\s(（]+)/);
+    if (jpMatch) {
+      const u2 = new SpeechSynthesisUtterance(jpMatch[1]);
+      u2.lang = 'ja-JP';
+      u2.rate = 0.7;
+      u2.pitch = 1.0;
+      u2.volume = 1.0;
+      if (voice) u2.voice = voice;
+      setTimeout(() => window.speechSynthesis.speak(u2), 900);
+    }
+  }
 }
 
 // =====================================================
@@ -1450,15 +1513,20 @@ function renderFC() {
   document.getElementById('fcTotal').textContent = fcDeck.length;
   const pct = ((fcIndex+1)/fcDeck.length)*100;
   document.getElementById('fcProgFill').style.width = pct+'%';
-  if(state.settings.audio) setTimeout(()=>speakJapanese(c.romaji),300);
+  if(state.settings.audio) setTimeout(()=>speakCharWithExample(c.char, c.example),300);
 }
 
 function flipFC() {
   const card = document.getElementById('flashcard');
   fcFlipped = !fcFlipped;
-  if(fcFlipped) card.classList.add('flipped');
-  else card.classList.remove('flipped');
-  if(fcFlipped) addXP(1);
+  if(fcFlipped) {
+    card.classList.add('flipped');
+    // ออกเสียงตัวอักษรจริงเมื่อพลิกการ์ด
+    if(fcDeck[fcIndex]) speakJapanese(fcDeck[fcIndex].char);
+    addXP(1);
+  } else {
+    card.classList.remove('flipped');
+  }
 }
 
 function nextFC() {
@@ -1488,7 +1556,7 @@ function markFC(difficulty) {
 }
 
 function speakCurrentFC() {
-  if(fcDeck[fcIndex]) speakJapanese(fcDeck[fcIndex].romaji);
+  if(fcDeck[fcIndex]) speakCharWithExample(fcDeck[fcIndex].char, fcDeck[fcIndex].example);
 }
 
 // =====================================================
@@ -1706,6 +1774,11 @@ function renderQuizQ() {
   document.getElementById('qChar').textContent = qChar;
   document.getElementById('qChar').style.fontFamily = (quizType==='romaji2char'||quizType==='speed') ? 'inherit' : "'Noto Sans JP',sans-serif";
   document.getElementById('qPrompt').textContent = qPrompt;
+
+  // ออกเสียงตัวอักษรญี่ปุ่นจริงๆ (เฉพาะ mode ที่แสดงตัวอักษร)
+  if(state.settings.audio && quizType !== 'romaji2char') {
+    setTimeout(() => speakJapanese(c.char), 200);
+  }
 
   const optsEl = document.getElementById('quizOptions');
   optsEl.innerHTML = options.map(opt=>`
