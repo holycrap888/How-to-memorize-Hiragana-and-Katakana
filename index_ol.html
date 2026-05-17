@@ -1,0 +1,3267 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ฮารุนะ - เรียนฮิรางานะ & คาตาคานะ</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Noto+Sans+Thai:wght@300;400;600;700&family=Fredoka+One&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a14;
+            --bg2: #12121f;
+            --bg3: #1a1a2e;
+            --card: rgba(255, 255, 255, 0.05);
+            --card-hover: rgba(255, 255, 255, 0.09);
+            --border: rgba(255, 255, 255, 0.1);
+            --pink: #ff6b9d;
+            --pink2: #ff4d8d;
+            --blue: #4fc3f7;
+            --purple: #b39ddb;
+            --green: #69f0ae;
+            --yellow: #ffd740;
+            --orange: #ffab40;
+            --red: #ff5252;
+            --text: #f0f0f8;
+            --text2: #a0a0b8;
+            --text3: #6060808;
+            --glow-pink: 0 0 20px rgba(255, 107, 157, 0.5);
+            --glow-blue: 0 0 20px rgba(79, 195, 247, 0.5);
+            --glow-green: 0 0 20px rgba(105, 240, 174, 0.5);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .light-mode {
+            --bg: #f0f4ff;
+            --bg2: #e8eeff;
+            --bg3: #dde4ff;
+            --card: rgba(255, 255, 255, 0.8);
+            --card-hover: rgba(255, 255, 255, 0.95);
+            --border: rgba(100, 100, 180, 0.2);
+            --text: #1a1a3e;
+            --text2: #4a4a7a;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Noto Sans Thai', 'Noto Sans JP', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* ===== PARTICLES ===== */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+            opacity: 0
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0
+            }
+
+            10% {
+                opacity: 0.6
+            }
+
+            90% {
+                opacity: 0.3
+            }
+
+            100% {
+                transform: translateY(-20vh) rotate(720deg);
+                opacity: 0
+            }
+        }
+
+        /* ===== LAYOUT ===== */
+        #app {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 16px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .light-mode .nav {
+            background: rgba(240, 244, 255, 0.9)
+        }
+
+        .nav-logo {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .nav-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background: var(--card-hover);
+            box-shadow: var(--glow-pink)
+        }
+
+        .xp-display {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.2), rgba(179, 157, 219, 0.2));
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+        }
+
+        .xp-display span {
+            color: var(--yellow);
+            font-weight: 700
+        }
+
+        .main {
+            padding-top: 60px;
+            min-height: 100vh
+        }
+
+        /* ===== TABS ===== */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 20, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            padding: 8px 4px;
+            gap: 2px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .light-mode .tab-bar {
+            background: rgba(240, 244, 255, 0.95)
+        }
+
+        .tab-bar::-webkit-scrollbar {
+            display: none
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 6px 4px;
+            border: none;
+            background: none;
+            color: var(--text2);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: var(--transition);
+            font-family: inherit;
+            font-size: 0.6rem;
+        }
+
+        .tab-btn.active {
+            color: var(--pink);
+            background: rgba(255, 107, 157, 0.1)
+        }
+
+        .tab-btn .icon {
+            font-size: 1.3rem
+        }
+
+        .tab-btn:hover {
+            color: var(--text);
+            background: var(--card)
+        }
+
+        /* ===== PAGE CONTENT ===== */
+        .page {
+            display: none;
+            padding: 16px 16px 100px;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeIn 0.4s ease
+        }
+
+        .page.active {
+            display: block
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            background: var(--card-hover)
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text)
+        }
+
+        /* ===== HOME DASHBOARD ===== */
+        .hero {
+            text-align: center;
+            padding: 32px 16px;
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.1), rgba(79, 195, 247, 0.1), rgba(179, 157, 219, 0.1));
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255, 107, 157, 0.15), transparent 70%);
+        }
+
+        .mascot {
+            font-size: 4rem;
+            animation: bounce 2s ease infinite;
+            display: inline-block
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-5deg)
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(5deg)
+            }
+        }
+
+        .hero h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2rem;
+            margin: 8px 0;
+            background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            color: var(--text2);
+            font-size: 0.9rem;
+            line-height: 1.6
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: 'Fredoka One', cursive
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text2);
+            margin-top: 2px
+        }
+
+        .lesson-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px
+        }
+
+        .lesson-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lesson-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            transition: var(--transition);
+        }
+
+        .lesson-card:hover::before {
+            opacity: 0.1
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 107, 157, 0.2)
+        }
+
+        .lesson-card .lc-icon {
+            font-size: 2rem;
+            margin-bottom: 8px
+        }
+
+        .lesson-card .lc-title {
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif
+        }
+
+        .lesson-card .lc-sub {
+            font-size: 0.75rem;
+            color: var(--text2);
+            margin-top: 4px
+        }
+
+        .lesson-card .lc-prog {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .lesson-card .lc-prog-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            transition: width 1s ease
+        }
+
+        .locked {
+            opacity: 0.5;
+            cursor: not-allowed
+        }
+
+        .locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 1rem
+        }
+
+        /* ===== LESSON GRID ===== */
+        .kana-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 16px
+        }
+
+        @media(max-width:400px) {
+            .kana-grid {
+                grid-template-columns: repeat(4, 1fr)
+            }
+        }
+
+        .kana-cell {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .kana-cell:hover {
+            background: var(--card-hover);
+            transform: scale(1.05);
+            box-shadow: var(--glow-pink)
+        }
+
+        .kana-cell.learned {
+            border-color: var(--green);
+            background: rgba(105, 240, 174, 0.1)
+        }
+
+        .kana-cell.hard {
+            border-color: var(--red);
+            background: rgba(255, 82, 82, 0.1)
+        }
+
+        .kana-cell .kc {
+            font-size: 1.4rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            display: block
+        }
+
+        .kana-cell .kr {
+            font-size: 0.65rem;
+            color: var(--text2);
+            display: block
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 16px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title .badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            font-weight: 600;
+            color: white;
+        }
+
+        /* ===== FLASHCARD SYSTEM ===== */
+        .flashcard-container {
+            perspective: 1000px;
+            margin-bottom: 16px
+        }
+
+        .flashcard {
+            width: 100%;
+            max-width: 340px;
+            height: 220px;
+            margin: 0 auto;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg)
+        }
+
+        .flashcard-front,
+        .flashcard-back {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: var(--radius);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+        }
+
+        .flashcard-front {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.15), rgba(179, 157, 219, 0.15));
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, rgba(79, 195, 247, 0.15), rgba(105, 240, 174, 0.15));
+        }
+
+        .fc-char {
+            font-size: 5rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            line-height: 1
+        }
+
+        .fc-type {
+            font-size: 0.75rem;
+            color: var(--text2);
+            margin-top: 8px
+        }
+
+        .fc-romaji {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--pink);
+            font-family: 'Fredoka One', cursive
+        }
+
+        .fc-thai {
+            font-size: 1rem;
+            color: var(--text2);
+            margin: 4px 0
+        }
+
+        .fc-hint {
+            font-size: 0.8rem;
+            color: var(--text2);
+            text-align: center;
+            margin-top: 8px;
+            line-height: 1.5
+        }
+
+        .fc-example {
+            font-size: 0.85rem;
+            color: var(--blue);
+            margin-top: 6px
+        }
+
+        .fc-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 16px
+        }
+
+        .btn {
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            color: white
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--glow-pink);
+            transform: translateY(-2px)
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--green), #00bcd4);
+            color: #111
+        }
+
+        .btn-success:hover {
+            box-shadow: var(--glow-green);
+            transform: translateY(-2px)
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--red), var(--orange));
+            color: white
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px)
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text)
+        }
+
+        .btn-outline:hover {
+            background: var(--card-hover)
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.8rem
+        }
+
+        .fc-progress {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            color: var(--text2);
+        }
+
+        .fc-progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            flex: 1;
+            margin: 0 12px;
+            overflow: hidden
+        }
+
+        .fc-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            border-radius: 3px;
+            transition: width 0.5s ease
+        }
+
+        .audio-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            font-size: 1.2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .audio-btn:hover {
+            box-shadow: var(--glow-blue);
+            transform: scale(1.1)
+        }
+
+        /* ===== QUIZ ===== */
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px
+        }
+
+        .quiz-score {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--yellow);
+            font-family: 'Fredoka One', cursive
+        }
+
+        .quiz-timer {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--pink);
+            font-family: 'Fredoka One', cursive;
+            position: relative;
+        }
+
+        .quiz-question {
+            text-align: center;
+            margin-bottom: 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px 16px;
+        }
+
+        .quiz-char {
+            font-size: 5rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            margin-bottom: 8px
+        }
+
+        .quiz-prompt {
+            font-size: 0.9rem;
+            color: var(--text2)
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px
+        }
+
+        .quiz-opt {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .quiz-opt:hover {
+            background: var(--card-hover);
+            border-color: var(--pink)
+        }
+
+        .quiz-opt.correct {
+            border-color: var(--green);
+            background: rgba(105, 240, 174, 0.15);
+            color: var(--green)
+        }
+
+        .quiz-opt.wrong {
+            border-color: var(--red);
+            background: rgba(255, 82, 82, 0.15);
+            color: var(--red)
+        }
+
+        .quiz-opt.disabled {
+            pointer-events: none
+        }
+
+        .combo-display {
+            text-align: center;
+            margin-bottom: 12px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            color: var(--orange);
+        }
+
+        /* ===== WRITING PRACTICE ===== */
+        .writing-canvas-wrap {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .writing-char {
+            font-size: 3rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            margin-bottom: 12px;
+            color: var(--text2)
+        }
+
+        canvas#drawCanvas {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            cursor: crosshair;
+            touch-action: none;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .stroke-guide {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 8px
+        }
+
+        .writing-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 12px
+        }
+
+        /* ===== MEMORY GAME ===== */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px
+        }
+
+        @media(max-width:360px) {
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr)
+            }
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .memory-card.revealed,
+        .memory-card.matched {
+            transform: rotateY(180deg)
+        }
+
+        .memory-card-inner {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            font-size: 1.1rem;
+        }
+
+        .memory-card-front {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.3), rgba(179, 157, 219, 0.3));
+            color: transparent;
+            user-select: none;
+        }
+
+        .memory-card-front::after {
+            content: '❓';
+            font-size: 1.5rem
+        }
+
+        .memory-card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, rgba(79, 195, 247, 0.2), rgba(105, 240, 174, 0.2));
+        }
+
+        .memory-card.matched .memory-card-back {
+            background: linear-gradient(135deg, rgba(105, 240, 174, 0.3), rgba(0, 188, 212, 0.3));
+            border: 2px solid var(--green)
+        }
+
+        /* ===== PROGRESS ===== */
+        .xp-bar-wrap {
+            margin-bottom: 16px
+        }
+
+        .xp-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.85rem
+        }
+
+        .xp-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            border-radius: 6px;
+            transition: width 1s ease
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px
+        }
+
+        .achievement {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .achievement.unlocked {
+            border-color: var(--yellow);
+            background: rgba(255, 215, 64, 0.1)
+        }
+
+        .achievement .ach-icon {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 4px;
+            filter: grayscale(1)
+        }
+
+        .achievement.unlocked .ach-icon {
+            filter: none
+        }
+
+        .achievement .ach-name {
+            font-size: 0.65rem;
+            color: var(--text2)
+        }
+
+        /* ===== CHAT / CONVERSATION ===== */
+        .chat-area {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-msg {
+            max-width: 80%;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start
+        }
+
+        .chat-msg.bot {
+            align-self: flex-start
+        }
+
+        .chat-msg.user {
+            align-self: flex-end;
+            flex-direction: row-reverse
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0
+        }
+
+        .chat-bubble {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            border: 1px solid var(--border);
+        }
+
+        .chat-msg.user .chat-bubble {
+            background: rgba(255, 107, 157, 0.15);
+            border-color: rgba(255, 107, 157, 0.3)
+        }
+
+        .chat-choices {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px
+        }
+
+        .choice-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .choice-btn:hover {
+            background: rgba(255, 107, 157, 0.2);
+            border-color: var(--pink)
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.active {
+            display: flex
+        }
+
+        .modal {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 380px;
+            width: 100%;
+            animation: modalIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .modal h2 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 8px
+        }
+
+        .modal p {
+            color: var(--text2);
+            margin-bottom: 16px;
+            line-height: 1.6
+        }
+
+        /* ===== LEVEL UP ===== */
+        .levelup-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .levelup-overlay.active {
+            display: flex;
+            animation: levelUp 0.5s ease
+        }
+
+        @keyframes levelUp {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .levelup-text {
+            font-family: 'Fredoka One', cursive;
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--yellow), var(--orange), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 0.5s ease infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1)
+            }
+
+            to {
+                transform: scale(1.05)
+            }
+        }
+
+        /* ===== XP POPUP ===== */
+        .xp-popup {
+            position: fixed;
+            bottom: 120px;
+            right: 20px;
+            z-index: 150;
+            background: linear-gradient(135deg, var(--yellow), var(--orange));
+            color: #111;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            animation: xpPop 1.5s ease forwards;
+            pointer-events: none;
+        }
+
+        @keyframes xpPop {
+            0% {
+                transform: translateY(0);
+                opacity: 1
+            }
+
+            100% {
+                transform: translateY(-60px);
+                opacity: 0
+            }
+        }
+
+        /* ===== STREAK ===== */
+        .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(255, 171, 64, 0.2), rgba(255, 82, 82, 0.2));
+            border: 1px solid rgba(255, 171, 64, 0.4);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+        }
+
+        .streak-badge .fire {
+            animation: flicker 0.5s ease infinite alternate
+        }
+
+        @keyframes flicker {
+            from {
+                transform: scale(1)
+            }
+
+            to {
+                transform: scale(1.2)rotate(5deg)
+            }
+        }
+
+        /* ===== SETTINGS ===== */
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toggle {
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .toggle.on {
+            background: linear-gradient(135deg, var(--pink), var(--purple))
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .toggle.on::after {
+            transform: translateX(24px)
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media(min-width:600px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr)
+            }
+
+            .lesson-grid {
+                grid-template-columns: repeat(3, 1fr)
+            }
+
+            .kana-grid {
+                grid-template-columns: repeat(8, 1fr)
+            }
+
+            .memory-grid {
+                grid-template-columns: repeat(5, 1fr)
+            }
+
+            .achievement-grid {
+                grid-template-columns: repeat(5, 1fr)
+            }
+
+            .quiz-options {
+                grid-template-columns: repeat(4, 1fr)
+            }
+        }
+
+        /* ===== HARUNA TIPS ===== */
+        .haruna-tip {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.1), rgba(179, 157, 219, 0.1));
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .haruna-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .haruna-tip-text {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text)
+        }
+
+        .haruna-tip-title {
+            font-weight: 700;
+            color: var(--pink);
+            margin-bottom: 4px;
+            font-size: 0.9rem
+        }
+
+        /* ===== FILTERS / SELECTOR ===== */
+        .type-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap
+        }
+
+        .type-btn {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: var(--text2);
+            transition: var(--transition);
+        }
+
+        .type-btn.active {
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            color: white;
+            border-color: transparent
+        }
+
+        /* ===== COMBO STREAK ANIMATION ===== */
+        .combo-anim {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 200;
+            pointer-events: none;
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5rem;
+            animation: comboPop 1s ease forwards;
+        }
+
+        @keyframes comboPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0
+            }
+
+            40% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1
+            }
+
+            80% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1
+            }
+
+            100% {
+                transform: translate(-50%, -70%) scale(0.8);
+                opacity: 0
+            }
+        }
+
+        /* ===== PROGRESS RING ===== */
+        .prog-ring {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px
+        }
+
+        .prog-ring svg {
+            transform: rotate(-90deg)
+        }
+
+        .prog-ring-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            color: var(--pink);
+        }
+
+        /* Decorative Japanese text background */
+        .jp-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+            opacity: 0.03;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 3rem;
+            word-break: break-all;
+            line-height: 1;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="jp-bg" id="jpBg"></div>
+    <div id="particles"></div>
+
+    <div id="app">
+        <nav class="nav">
+            <div class="nav-logo" onclick="showPage('home')">🌸 ฮารุนะ</div>
+            <div class="nav-actions">
+                <div class="streak-badge"><span class="fire">🔥</span><span id="streakCount">0</span> วัน</div>
+                <div class="xp-display">⭐ <span id="navXP">0</span></div>
+                <button class="nav-btn" onclick="toggleTheme()">🌙</button>
+            </div>
+        </nav>
+
+        <main class="main">
+            <!-- HOME -->
+            <div class="page active" id="page-home">
+                <div class="hero">
+                    <div class="mascot">🌸</div>
+                    <h1>ฮารุนะ ญี่ปุ่น</h1>
+                    <p>เรียนฮิรางานะ & คาตาคานะ<br>แบบสนุก จำเร็ว ไม่เบื่อ! 🎌</p>
+                    <div style="margin-top:12px">
+                        <button class="btn btn-primary" onclick="showPage('hiragana')">เริ่มเรียนเลย! ▶</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-val" style="color:var(--pink)" id="statLearned">0</div>
+                        <div class="stat-label">ตัวอักษรที่จำได้</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" style="color:var(--yellow)" id="statXP">0</div>
+                        <div class="stat-label">XP สะสม</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" style="color:var(--green)" id="statStreak">0</div>
+                        <div class="stat-label">วันต่อเนื่อง</div>
+                    </div>
+                </div>
+
+                <div class="xp-bar-wrap">
+                    <div class="xp-bar-label"><span>Level <span id="userLevel">1</span></span><span id="xpProgress">0 /
+                            100 XP</span></div>
+                    <div class="xp-bar">
+                        <div class="xp-bar-fill" id="xpFill" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div class="haruna-tip">
+                    <div class="haruna-avatar">🌸</div>
+                    <div>
+                        <div class="haruna-tip-title">ฮารุนะ บอกว่า...</div>
+                        <div class="haruna-tip-text" id="dailyTip">กำลังโหลดคำแนะนำ...</div>
+                    </div>
+                </div>
+
+                <div class="section-title">📚 บทเรียนของฉัน <span class="badge">เลือกบทเรียน</span></div>
+                <div class="lesson-grid">
+                    <div class="lesson-card" onclick="showPage('hiragana')">
+                        <div class="lc-icon">あ</div>
+                        <div class="lc-title">ฮิรางานะ</div>
+                        <div class="lc-sub">46 ตัวพื้นฐาน + เสริม</div>
+                        <div class="lc-prog">
+                            <div class="lc-prog-fill" id="hiraProgFill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="showPage('katakana')">
+                        <div class="lc-icon">ア</div>
+                        <div class="lc-title">คาตาคานะ</div>
+                        <div class="lc-sub">46 ตัวพื้นฐาน + เสริม</div>
+                        <div class="lc-prog">
+                            <div class="lc-prog-fill" id="kataProgFill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="showPage('flashcards')">
+                        <div class="lc-icon">🃏</div>
+                        <div class="lc-title">ฝึกด้วยการ์ด</div>
+                        <div class="lc-sub">Flashcard + เสียง</div>
+                        <div class="lc-prog">
+                            <div class="lc-prog-fill" style="width:60%"></div>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="showPage('quiz')">
+                        <div class="lc-icon">⚔️</div>
+                        <div class="lc-title">Quiz Arena</div>
+                        <div class="lc-sub">ทดสอบความจำ</div>
+                        <div class="lc-prog">
+                            <div class="lc-prog-fill" style="width:40%"></div>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="showPage('memory')">
+                        <div class="lc-icon">🧠</div>
+                        <div class="lc-title">Memory Game</div>
+                        <div class="lc-sub">เกมจับคู่ตัวอักษร</div>
+                        <div class="lc-prog">
+                            <div class="lc-prog-fill" style="width:20%"></div>
+                        </div>
+                    </div>
+                    <div class="lesson-card" onclick="showPage('conversation')">
+                        <div class="lc-icon">💬</div>
+                        <div class="lc-title">สนทนาภาษาญี่ปุ่น</div>
+                        <div class="lc-sub">ฝึกพูดกับฮารุนะ</div>
+                        <div class="lc-prog">
+                            <div class="lc-prog-fill" style="width:10%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">🏆 ความสำเร็จ</div>
+                <div class="achievement-grid" id="homeAchievements"></div>
+            </div>
+
+            <!-- HIRAGANA -->
+            <div class="page" id="page-hiragana">
+                <div class="section-title" style="font-size:1.3rem">あ ฮิรางานะ <span class="badge">Japanese
+                        Script</span></div>
+                <div class="haruna-tip">
+                    <div class="haruna-avatar">🌸</div>
+                    <div>
+                        <div class="haruna-tip-title">ทำไมต้องเรียนฮิรางานะ?</div>
+                        <div class="haruna-tip-text">ฮิรางานะ เป็นตัวอักษรพื้นฐานของภาษาญี่ปุ่น ใช้เขียนคำไวยากรณ์
+                            คำลงท้าย และคำพื้นเมือง ถ้าจำได้ครบทั้ง 46 ตัว จะอ่านภาษาญี่ปุ่นได้เลยค่ะ! 🌟</div>
+                    </div>
+                </div>
+                <div class="type-selector" id="hiraFilter">
+                    <button class="type-btn active" onclick="filterHira('all',this)">ทั้งหมด</button>
+                    <button class="type-btn" onclick="filterHira('vowel',this)">สระ</button>
+                    <button class="type-btn" onclick="filterHira('k',this)">K-แถว</button>
+                    <button class="type-btn" onclick="filterHira('s',this)">S-แถว</button>
+                    <button class="type-btn" onclick="filterHira('t',this)">T-แถว</button>
+                    <button class="type-btn" onclick="filterHira('n',this)">N-แถว</button>
+                    <button class="type-btn" onclick="filterHira('h',this)">H-แถว</button>
+                    <button class="type-btn" onclick="filterHira('m',this)">M-แถว</button>
+                    <button class="type-btn" onclick="filterHira('r',this)">R-แถว</button>
+                    <button class="type-btn" onclick="filterHira('combo',this)">ผสม</button>
+                    <button class="type-btn" onclick="filterHira('dakuten',this)">ดาคุเต็น</button>
+                </div>
+                <div class="kana-grid" id="hiraGrid"></div>
+            </div>
+
+            <!-- KATAKANA -->
+            <div class="page" id="page-katakana">
+                <div class="section-title" style="font-size:1.3rem">ア คาตาคานะ <span class="badge">Foreign Words</span>
+                </div>
+                <div class="haruna-tip">
+                    <div class="haruna-avatar">🌸</div>
+                    <div>
+                        <div class="haruna-tip-title">คาตาคานะใช้ทำอะไร?</div>
+                        <div class="haruna-tip-text">คาตาคานะใช้เขียนคำทับศัพท์จากภาษาต่างประเทศ เช่น コーヒー (coffee) ケーキ
+                            (cake) นอกจากนี้ยังใช้เน้นคำหรือเขียนชื่อต่างชาติค่ะ! 🌍</div>
+                    </div>
+                </div>
+                <div class="type-selector" id="kataFilter">
+                    <button class="type-btn active" onclick="filterKata('all',this)">ทั้งหมด</button>
+                    <button class="type-btn" onclick="filterKata('vowel',this)">สระ</button>
+                    <button class="type-btn" onclick="filterKata('k',this)">K-แถว</button>
+                    <button class="type-btn" onclick="filterKata('s',this)">S-แถว</button>
+                    <button class="type-btn" onclick="filterKata('t',this)">T-แถว</button>
+                    <button class="type-btn" onclick="filterKata('n',this)">N-แถว</button>
+                    <button class="type-btn" onclick="filterKata('h',this)">H-แถว</button>
+                    <button class="type-btn" onclick="filterKata('m',this)">M-แถว</button>
+                    <button class="type-btn" onclick="filterKata('r',this)">R-แถว</button>
+                    <button class="type-btn" onclick="filterKata('combo',this)">ผสม</button>
+                    <button class="type-btn" onclick="filterKata('dakuten',this)">ดาคุเต็น</button>
+                </div>
+                <div class="kana-grid" id="kataGrid"></div>
+            </div>
+
+            <!-- FLASHCARDS -->
+            <div class="page" id="page-flashcards">
+                <div class="section-title">🃏 Flashcard <span class="badge">กดเพื่อพลิก</span></div>
+                <div class="type-selector">
+                    <button class="type-btn active" id="fcTypeAll" onclick="setFCType('all',this)">ทั้งหมด</button>
+                    <button class="type-btn" onclick="setFCType('hiragana',this)">ฮิรางานะ</button>
+                    <button class="type-btn" onclick="setFCType('katakana',this)">คาตาคานะ</button>
+                    <button class="type-btn" onclick="setFCType('weak',this)">⚡ ยังยาก</button>
+                </div>
+                <div class="fc-progress">
+                    <span id="fcCurrent">0</span>/<span id="fcTotal">0</span>
+                    <div class="fc-progress-bar">
+                        <div class="fc-progress-fill" id="fcProgFill" style="width:0%"></div>
+                    </div>
+                    <button class="audio-btn" id="fcAudioBtn" onclick="speakCurrentFC()">🔊</button>
+                </div>
+                <div class="flashcard-container">
+                    <div class="flashcard" id="flashcard" onclick="flipFC()">
+                        <div class="flashcard-front">
+                            <div class="fc-char" id="fcChar">あ</div>
+                            <div class="fc-type" id="fcTypeLabel">ฮิรางานะ</div>
+                            <div style="margin-top:12px;font-size:0.8rem;color:var(--text2)">👆 แตะเพื่อดูคำตอบ</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <div class="fc-romaji" id="fcRomaji">a</div>
+                            <div class="fc-thai" id="fcThai">อา</div>
+                            <div class="fc-hint" id="fcHint">💡 ความจำ: ...</div>
+                            <div class="fc-example" id="fcExample">📝 ...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fc-controls">
+                    <button class="btn btn-danger" onclick="markFC('hard')">😓 ยังยาก</button>
+                    <button class="btn btn-outline btn-sm" onclick="nextFC()">ข้าม →</button>
+                    <button class="btn btn-success" onclick="markFC('easy')">✅ จำได้แล้ว!</button>
+                </div>
+                <div class="haruna-tip">
+                    <div class="haruna-avatar">🌸</div>
+                    <div>
+                        <div class="haruna-tip-title">เทคนิคการจำแบบฮารุนะ</div>
+                        <div class="haruna-tip-text" id="fcTip">ลองนึกภาพในหัวว่าตัวอักษรนี้เหมือนอะไร
+                            แล้วเชื่อมกับเสียงที่อ่าน จะจำได้เร็วกว่าการท่อง 10 เท่าค่ะ! 🧠✨</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WRITING -->
+            <div class="page" id="page-writing">
+                <div class="section-title">✍️ ฝึกเขียน <span class="badge">ลาก-เขียน</span></div>
+                <div class="haruna-tip">
+                    <div class="haruna-avatar">🌸</div>
+                    <div>
+                        <div class="haruna-tip-title">เคล็ดลับการเขียนญี่ปุ่น</div>
+                        <div class="haruna-tip-text">การเขียนซ้ำๆ ช่วยให้จำตัวอักษรได้ดีขึ้นมากค่ะ! ลองเขียนอย่างน้อย 10
+                            ครั้งต่อตัว แล้วจะติดมือเอง 💪</div>
+                    </div>
+                </div>
+                <div class="type-selector">
+                    <button class="type-btn active" onclick="setWriteType('hiragana',this)">ฮิรางานะ</button>
+                    <button class="type-btn" onclick="setWriteType('katakana',this)">คาตาคานะ</button>
+                </div>
+                <div class="writing-canvas-wrap">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px">
+                        <div>
+                            <div class="writing-char" id="writeChar">あ</div>
+                            <div style="font-size:1rem;font-weight:700;color:var(--pink)" id="writeRomaji">a</div>
+                            <div style="font-size:0.8rem;color:var(--text2)" id="writeThai">อา</div>
+                        </div>
+                        <div style="font-size:0.8rem;color:var(--text2);max-width:140px;line-height:1.5"
+                            id="writeMnemonic">ตำแหน่งลำดับการเขียน</div>
+                    </div>
+                    <canvas id="drawCanvas" width="280" height="200"></canvas>
+                    <div class="writing-controls">
+                        <button class="btn btn-outline btn-sm" onclick="clearCanvas()">🗑️ ลบ</button>
+                        <button class="btn btn-primary btn-sm" onclick="nextWriteChar()">ตัวต่อไป →</button>
+                        <button class="btn btn-success btn-sm" onclick="checkWriting()">✅ ดูตัวอย่าง</button>
+                    </div>
+                </div>
+                <div class="section-title">เลือกตัวที่จะฝึก</div>
+                <div class="kana-grid" id="writeSelectGrid"></div>
+            </div>
+
+            <!-- QUIZ -->
+            <div class="page" id="page-quiz">
+                <div class="section-title">⚔️ Quiz Arena <span class="badge">สู้เลย!</span></div>
+                <div id="quizMenu">
+                    <div class="haruna-tip">
+                        <div class="haruna-avatar">🌸</div>
+                        <div>
+                            <div class="haruna-tip-title">เลือกประเภท Quiz</div>
+                            <div class="haruna-tip-text">ทดสอบความจำด้วย Quiz หลายแบบ! ยิ่งทำบ่อย ยิ่งจำดีขึ้นค่ะ 🎯
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lesson-grid">
+                        <div class="lesson-card" onclick="startQuiz('char2romaji')">
+                            <div class="lc-icon">🔤</div>
+                            <div class="lc-title">ตัวอักษร → โรมาจิ</div>
+                            <div class="lc-sub">เห็นตัวอักษรแล้วเลือก romaji</div>
+                        </div>
+                        <div class="lesson-card" onclick="startQuiz('romaji2char')">
+                            <div class="lc-icon">🎯</div>
+                            <div class="lc-title">โรมาจิ → ตัวอักษร</div>
+                            <div class="lc-sub">เห็น romaji แล้วเลือกตัวอักษร</div>
+                        </div>
+                        <div class="lesson-card" onclick="startQuiz('speed')">
+                            <div class="lc-icon">⚡</div>
+                            <div class="lc-title">Speed Challenge</div>
+                            <div class="lc-sub">แข่งกับเวลา! 30 วินาที</div>
+                        </div>
+                        <div class="lesson-card" onclick="startQuiz('mixed')">
+                            <div class="lc-icon">🌀</div>
+                            <div class="lc-title">Mixed Quiz</div>
+                            <div class="lc-sub">ฮิรางานะ + คาตาคานะ ผสมกัน</div>
+                        </div>
+                    </div>
+                    <div class="type-selector" style="margin-top:8px">
+                        <button class="type-btn active" onclick="setQuizScope('all',this)">ทั้งหมด</button>
+                        <button class="type-btn" onclick="setQuizScope('hiragana',this)">ฮิรางานะ</button>
+                        <button class="type-btn" onclick="setQuizScope('katakana',this)">คาตาคานะ</button>
+                        <button class="type-btn" onclick="setQuizScope('weak',this)">⚡ ตัวที่ยาก</button>
+                    </div>
+                </div>
+                <div id="quizGame" style="display:none">
+                    <div class="quiz-header">
+                        <div>
+                            <div class="quiz-score">⭐ <span id="quizScore">0</span></div>
+                            <div style="font-size:0.75rem;color:var(--text2)">คำถาม <span id="qNum">1</span>/<span
+                                    id="qTotal">10</span></div>
+                        </div>
+                        <div class="quiz-timer" id="quizTimer">30</div>
+                        <button class="btn btn-outline btn-sm" onclick="endQuiz()">⏹ หยุด</button>
+                    </div>
+                    <div class="combo-display">🔥 Combo: <span id="quizCombo">0</span>x</div>
+                    <div class="quiz-question">
+                        <div class="quiz-char" id="qChar">あ</div>
+                        <div class="quiz-prompt" id="qPrompt">เลือก romaji ที่ถูกต้อง</div>
+                    </div>
+                    <div class="quiz-options" id="quizOptions"></div>
+                </div>
+                <div id="quizResult" style="display:none">
+                    <div class="modal" style="max-width:100%;background:var(--bg2)">
+                        <div style="font-size:3rem">🏆</div>
+                        <h2>จบแล้ว!</h2>
+                        <div style="font-size:2rem;font-weight:700;color:var(--yellow);margin:8px 0" id="resultScore">0
+                        </div>
+                        <p id="resultMsg">ทำได้ดีมาก!</p>
+                        <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
+                            <button class="btn btn-primary" onclick="restartQuiz()">🔄 เล่นอีก</button>
+                            <button class="btn btn-outline" onclick="showPage('quiz')">🏠 หน้าหลัก</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEMORY GAME -->
+            <div class="page" id="page-memory">
+                <div class="section-title">🧠 Memory Game <span class="badge">จับคู่ตัวอักษร</span></div>
+                <div id="memoryMenu">
+                    <div class="haruna-tip">
+                        <div class="haruna-avatar">🌸</div>
+                        <div>
+                            <div class="haruna-tip-title">วิธีเล่น Memory Game</div>
+                            <div class="haruna-tip-text">จับคู่ตัวอักษรญี่ปุ่นกับ romaji ที่ตรงกัน!
+                                จะช่วยให้สมองจดจำทั้งรูปร่างและเสียงพร้อมกันค่ะ 🎮</div>
+                        </div>
+                    </div>
+                    <div class="lesson-grid">
+                        <div class="lesson-card" onclick="startMemory('easy')">
+                            <div class="lc-icon">😊</div>
+                            <div class="lc-title">ง่าย</div>
+                            <div class="lc-sub">6 คู่ (12 การ์ด)</div>
+                        </div>
+                        <div class="lesson-card" onclick="startMemory('medium')">
+                            <div class="lc-icon">😤</div>
+                            <div class="lc-title">ปานกลาง</div>
+                            <div class="lc-sub">10 คู่ (20 การ์ด)</div>
+                        </div>
+                        <div class="lesson-card" onclick="startMemory('hard')">
+                            <div class="lc-icon">😰</div>
+                            <div class="lc-title">ยาก</div>
+                            <div class="lc-sub">15 คู่ (30 การ์ด)</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="memoryGame" style="display:none">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:12px;align-items:center">
+                        <div style="font-size:0.9rem">คู่ที่จับได้: <span id="memMatches"
+                                style="color:var(--green);font-weight:700">0</span>/<span id="memTotal">0</span></div>
+                        <div style="font-size:0.9rem">การพลิก: <span id="memFlips"
+                                style="color:var(--pink);font-weight:700">0</span></div>
+                        <button class="btn btn-outline btn-sm" onclick="showPage('memory')">⏹ หยุด</button>
+                    </div>
+                    <div class="memory-grid" id="memGrid"></div>
+                </div>
+            </div>
+
+            <!-- CONVERSATION -->
+            <div class="page" id="page-conversation">
+                <div class="section-title">💬 สนทนาภาษาญี่ปุ่น <span class="badge">กับฮารุนะ</span></div>
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+                    <button class="type-btn active" onclick="setConvScene('greeting',this)">การทักทาย</button>
+                    <button class="type-btn" onclick="setConvScene('intro',this)">แนะนำตัว</button>
+                    <button class="type-btn" onclick="setConvScene('shopping',this)">ช้อปปิ้ง</button>
+                    <button class="type-btn" onclick="setConvScene('food',this)">อาหาร</button>
+                    <button class="type-btn" onclick="setConvScene('direction',this)">เดินทาง</button>
+                </div>
+                <div class="chat-area" id="chatArea"></div>
+                <div class="chat-choices" id="chatChoices"></div>
+            </div>
+
+            <!-- PROGRESS -->
+            <div class="page" id="page-progress">
+                <div class="section-title">📊 ความก้าวหน้า <span class="badge">สถิติของฉัน</span></div>
+                <div class="card" style="margin-bottom:16px">
+                    <div style="text-align:center">
+                        <div class="prog-ring">
+                            <svg width="80" height="80" viewBox="0 0 80 80">
+                                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.1)"
+                                    stroke-width="8" />
+                                <circle cx="40" cy="40" r="32" fill="none" stroke="url(#ringGrad)" stroke-width="8"
+                                    stroke-linecap="round" stroke-dasharray="201" id="progCircle"
+                                    stroke-dashoffset="201" />
+                                <defs>
+                                    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#ff6b9d" />
+                                        <stop offset="100%" stop-color="#b39ddb" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="prog-ring-text" id="progPct">0%</div>
+                        </div>
+                        <div style="margin-top:8px;font-size:0.85rem;color:var(--text2)">ความก้าวหน้าโดยรวม</div>
+                    </div>
+                </div>
+                <div class="stats-grid" style="margin-bottom:16px">
+                    <div class="stat-card">
+                        <div class="stat-val" style="color:var(--pink)" id="progHira">0/46</div>
+                        <div class="stat-label">ฮิรางานะ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" style="color:var(--blue)" id="progKata">0/46</div>
+                        <div class="stat-label">คาตาคานะ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" style="color:var(--orange)" id="progWeak">0</div>
+                        <div class="stat-label">ตัวยาก</div>
+                    </div>
+                </div>
+                <div class="section-title">🏆 ความสำเร็จ</div>
+                <div class="achievement-grid" id="allAchievements"></div>
+                <div class="section-title" style="margin-top:16px">📅 Daily Missions</div>
+                <div id="dailyMissions" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div class="page" id="page-settings">
+                <div class="section-title">⚙️ ตั้งค่า</div>
+                <div class="card">
+                    <div class="setting-row">
+                        <div>
+                            <div style="font-weight:600">โหมดกลางวัน</div>
+                            <div style="font-size:0.75rem;color:var(--text2)">เปลี่ยนธีมเป็นสว่าง</div>
+                        </div>
+                        <div class="toggle" id="lightToggle" onclick="toggleTheme()"></div>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div style="font-weight:600">เสียงพูด</div>
+                            <div style="font-size:0.75rem;color:var(--text2)">ออกเสียงตัวอักษรอัตโนมัติ</div>
+                        </div>
+                        <div class="toggle on" id="audioToggle" onclick="toggleSetting('audio')"></div>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div style="font-weight:600">แสดง Romaji</div>
+                            <div style="font-size:0.75rem;color:var(--text2)">แสดงการอ่านโรมาจิใต้ตัวอักษร</div>
+                        </div>
+                        <div class="toggle on" id="romajiToggle" onclick="toggleSetting('romaji')"></div>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div style="font-weight:600">เอฟเฟกต์อนิเมชัน</div>
+                            <div style="font-size:0.75rem;color:var(--text2)">เปิด/ปิด particle effect</div>
+                        </div>
+                        <div class="toggle on" id="particleToggle" onclick="toggleSetting('particles')"></div>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div style="font-weight:600">Spaced Repetition</div>
+                            <div style="font-size:0.75rem;color:var(--text2)">ให้ตัวที่ยากออกบ่อยกว่า</div>
+                        </div>
+                        <div class="toggle on" id="srToggle" onclick="toggleSetting('sr')"></div>
+                    </div>
+                </div>
+                <div style="margin-top:16px">
+                    <button class="btn btn-danger" onclick="resetProgress()" style="width:100%">⚠️
+                        รีเซ็ตความก้าวหน้าทั้งหมด</button>
+                </div>
+                <div class="haruna-tip" style="margin-top:16px">
+                    <div class="haruna-avatar">🌸</div>
+                    <div>
+                        <div class="haruna-tip-title">เวอร์ชัน 1.0.0</div>
+                        <div class="haruna-tip-text">ฮารุนะ Japanese Learning App<br>สร้างด้วย ❤️
+                            สำหรับนักเรียนไทย<br>ฮิรางานะ + คาตาคานะ ครบชุด!</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="tab-bar">
+            <button class="tab-btn active" data-page="home" onclick="showPage('home')"><span
+                    class="icon">🏠</span>หน้าหลัก</button>
+            <button class="tab-btn" data-page="hiragana" onclick="showPage('hiragana')"><span
+                    class="icon">あ</span>ฮิรางานะ</button>
+            <button class="tab-btn" data-page="katakana" onclick="showPage('katakana')"><span
+                    class="icon">ア</span>คาตาคานะ</button>
+            <button class="tab-btn" data-page="flashcards" onclick="showPage('flashcards')"><span
+                    class="icon">🃏</span>การ์ด</button>
+            <button class="tab-btn" data-page="writing" onclick="showPage('writing')"><span
+                    class="icon">✍️</span>เขียน</button>
+            <button class="tab-btn" data-page="quiz" onclick="showPage('quiz')"><span
+                    class="icon">⚔️</span>Quiz</button>
+            <button class="tab-btn" data-page="memory" onclick="showPage('memory')"><span
+                    class="icon">🧠</span>Memory</button>
+            <button class="tab-btn" data-page="conversation" onclick="showPage('conversation')"><span
+                    class="icon">💬</span>สนทนา</button>
+            <button class="tab-btn" data-page="progress" onclick="showPage('progress')"><span
+                    class="icon">📊</span>ความก้าว</button>
+            <button class="tab-btn" data-page="settings" onclick="showPage('settings')"><span
+                    class="icon">⚙️</span>ตั้งค่า</button>
+        </nav>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="kanaModal">
+        <div class="modal">
+            <div style="font-size:4rem;font-family:'Noto Sans JP',sans-serif" id="modalChar">あ</div>
+            <h2 id="modalRomaji" style="color:var(--pink)">a</h2>
+            <p id="modalThai">อา</p>
+            <div style="background:rgba(255,107,157,0.1);border-radius:var(--radius-sm);padding:12px;margin:8px 0;font-size:0.85rem;line-height:1.6"
+                id="modalMnemonic"></div>
+            <div style="font-size:0.85rem;color:var(--blue);margin-bottom:12px" id="modalExample"></div>
+            <div style="display:flex;gap:8px;justify-content:center">
+                <button class="btn btn-outline btn-sm" onclick="speakModal()">🔊 ฟังเสียง</button>
+                <button class="btn btn-primary btn-sm" onclick="goWriteChar()">✍️ ฝึกเขียน</button>
+                <button class="btn btn-success btn-sm" onclick="markModalLearned()">✅ จำได้</button>
+                <button class="btn btn-outline btn-sm" onclick="closeModal()">✕ ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="levelup-overlay" id="levelupOverlay">
+        <div style="font-size:5rem">🎉</div>
+        <div class="levelup-text">Level Up!</div>
+        <div style="font-size:1.2rem;color:var(--yellow)">Level <span id="newLevel">2</span></div>
+        <div style="color:var(--text2);font-size:0.9rem">เก่งมากค่ะ! ฮารุนะภูมิใจมาก! 🌸</div>
+        <button class="btn btn-primary" onclick="closeLevelup()" style="margin-top:16px">🚀 ไปต่อ!</button>
+    </div>
+
+    <script>
+        // =====================================================
+        // DATA: Complete Hiragana Database
+        // =====================================================
+        const HIRAGANA = [
+            // Vowels
+            { char: 'あ', romaji: 'a', thai: 'อา', type: 'vowel', mnemonic: 'เหมือนคนกำลัง อ้าปาก แล้วพูดว่า "อาาาา" 😮', example: 'あめ (ame) = ฝน' },
+            { char: 'い', romaji: 'i', thai: 'อิ', type: 'vowel', mnemonic: 'เหมือนเลข 1 สองอัน (い) ใครที่ยืน "อิอิ" อยู่สองคน 🧍🧍', example: 'いぬ (inu) = สุนัข' },
+            { char: 'う', romaji: 'u', thai: 'อุ', type: 'vowel', mnemonic: 'เหมือนปากที่ยื่นออกมาพูดว่า "อุ" ปากจู๋ 😗', example: 'うみ (umi) = ทะเล' },
+            { char: 'え', romaji: 'e', thai: 'เอ', type: 'vowel', mnemonic: 'เหมือนเสาไฟฟ้า ตัว え มีขาค้ำยัน "เอ!" น่าจะตก 😱', example: 'えき (eki) = สถานีรถไฟ' },
+            { char: 'お', romaji: 'o', thai: 'โอ', type: 'vowel', mnemonic: 'เหมือนคนนั่งยองๆ มองดูอะไร แล้วอ้า "โอ้โห!" 😲', example: 'おかあ (okaa) = แม่' },
+            // K row
+            { char: 'か', romaji: 'ka', thai: 'คะ', type: 'k', mnemonic: 'ตัวか เหมือนนักกายกรรม "คะ!" ที่กำลังหมุนตัว 🤸', example: 'かみ (kami) = ผม' },
+            { char: 'き', romaji: 'ki', thai: 'คิ', type: 'k', mnemonic: 'ตัวき เหมือนต้นไม้ที่มีกิ่งก้าน "คิ" เหมือน "tree" ในภาษาญี่ปุ่น 🌳', example: 'き (ki) = ต้นไม้' },
+            { char: 'く', romaji: 'ku', thai: 'คุ', type: 'k', mnemonic: 'ตัวく เหมือนปากนกที่อ้าค้างไว้ "คุ!" นกกำลังร้อง 🐦', example: 'くも (kumo) = เมฆ' },
+            { char: 'け', romaji: 'ke', thai: 'เค', type: 'k', mnemonic: 'ตัวけ เหมือนคนยืนแบกของ "เค" นะแบกหนักมาก 😤', example: 'けむり (kemuri) = ควัน' },
+            { char: 'こ', romaji: 'ko', thai: 'โค', type: 'k', mnemonic: 'ตัวこ เหมือนเลข 2 นอนราบ "โค" ตัวอักษรนอนสองชั้น 💤', example: 'こねこ (koneko) = ลูกแมว' },
+            // S row
+            { char: 'さ', romaji: 'sa', thai: 'ซะ', type: 's', mnemonic: 'ตัวさ เหมือนคนนั่งดื่มกาแฟ "ซะ!" พักก่อนนะ ☕', example: 'さくら (sakura) = ดอกซากุระ' },
+            { char: 'し', romaji: 'shi', thai: 'ชิ', type: 's', mnemonic: 'ตัวし เหมือนขอเกี่ยวที่งอขึ้น "ชิ" งอขึ้นเหมือนตะขอ 🪝', example: 'しろ (shiro) = สีขาว' },
+            { char: 'す', romaji: 'su', thai: 'ซุ', type: 's', mnemonic: 'ตัวす เหมือนอ่างน้ำวน "ซุ" น้ำวนๆ 🌀', example: 'すし (sushi) = ซูชิ' },
+            { char: 'せ', romaji: 'se', thai: 'เซ', type: 's', mnemonic: 'ตัวせ เหมือนโต๊ะที่มีขาสั้น "เซ" โต๊ะเซไม่มั่นคง 🪑', example: 'せんせい (sensei) = ครู' },
+            { char: 'そ', romaji: 'so', thai: 'โซ', type: 's', mnemonic: 'ตัวそ เหมือนสายฟ้าโค้ง "โซ" ฟ้าแลบโซ่ซ่า ⚡', example: 'そら (sora) = ท้องฟ้า' },
+            // T row
+            { char: 'た', romaji: 'ta', thai: 'ตะ', type: 't', mnemonic: 'ตัวた เหมือนคนตีกอล์ฟ "ตะ" แกว่งไม้กอล์ฟ ⛳', example: 'たまご (tamago) = ไข่' },
+            { char: 'ち', romaji: 'chi', thai: 'ชิ', type: 't', mnemonic: 'ตัวち เหมือนตัวเลข 6 ที่พลิก "ชิ" เลข 6 กลับหัว 6️⃣', example: 'ちず (chizu) = แผนที่' },
+            { char: 'つ', romaji: 'tsu', thai: 'ซึ', type: 't', mnemonic: 'ตัวつ เหมือนคลื่นทะเล "ซึ" คลื่นโค้งๆ 🌊', example: 'つき (tsuki) = พระจันทร์' },
+            { char: 'て', romaji: 'te', thai: 'เต', type: 't', mnemonic: 'ตัวて เหมือนเส้นที่ห้อยลงมา "เต" เส้นห้อยน้อย 🪢', example: 'てがみ (tegami) = จดหมาย' },
+            { char: 'と', romaji: 'to', thai: 'โต', type: 't', mnemonic: 'ตัวと เหมือนกุญแจ "โต" กุญแจใบโตๆ 🗝️', example: 'とり (tori) = นก' },
+            // N row
+            { char: 'な', romaji: 'na', thai: 'นะ', type: 'n', mnemonic: 'ตัวな เหมือนปลาที่ว่ายน้ำ "นะ" ปลาน่ารักๆ 🐟', example: 'なまえ (namae) = ชื่อ' },
+            { char: 'に', romaji: 'ni', thai: 'นิ', type: 'n', mnemonic: 'ตัวに เหมือนเข็มทิศ "นิ" ชี้ทิศ 🧭', example: 'にほん (nihon) = ญี่ปุ่น' },
+            { char: 'ぬ', romaji: 'nu', thai: 'นุ', type: 'n', mnemonic: 'ตัวぬ เหมือนเส้นบะหมี่ที่พันกัน "นุ" บะหมี่กึ๋ยน 🍜', example: 'ぬいぐるみ (nuigurumi) = ตุ๊กตา' },
+            { char: 'ね', romaji: 'ne', thai: 'เน', type: 'n', mnemonic: 'ตัวね เหมือนแมวที่ขดตัวนอน "เน" แมวเนียๆ 🐱', example: 'ねこ (neko) = แมว' },
+            { char: 'の', romaji: 'no', thai: 'โน', type: 'n', mnemonic: 'ตัวの เหมือนเส้นวนรูปตัว o "โน" วนเป็นวงกลม ⭕', example: 'のり (nori) = สาหร่าย' },
+            // H row
+            { char: 'は', romaji: 'ha', thai: 'ฮะ', type: 'h', mnemonic: 'ตัวは เหมือนคนที่หัวเราะ "ฮะฮะ" ปากอ้ากว้าง 😄', example: 'はな (hana) = ดอกไม้' },
+            { char: 'ひ', romaji: 'hi', thai: 'ฮิ', type: 'h', mnemonic: 'ตัวひ เหมือนตัว B ที่ถูกกระชากออก "ฮิ" B ขาดกลาง 😅', example: 'ひと (hito) = คน' },
+            { char: 'ふ', romaji: 'fu', thai: 'ฟุ', type: 'h', mnemonic: 'ตัวふ เหมือนใบพัด "ฟุ" พัดลมหมุนๆ 🌀', example: 'ふゆ (fuyu) = ฤดูหนาว' },
+            { char: 'へ', romaji: 'he', thai: 'เฮ', type: 'h', mnemonic: 'ตัวへ เหมือนหลังคาบ้าน "เฮ" บ้านหลังคาแหลม 🏠', example: 'へや (heya) = ห้อง' },
+            { char: 'ほ', romaji: 'ho', thai: 'โฮ', type: 'h', mnemonic: 'ตัวほ เหมือนซานตาคลอส "โฮโฮโฮ" ยืนถือของขวัญ 🎅', example: 'ほし (hoshi) = ดาว' },
+            // M row
+            { char: 'ま', romaji: 'ma', thai: 'มะ', type: 'm', mnemonic: 'ตัวま เหมือนมดที่มีหนวด "มะ" มดแมลง 🐜', example: 'まち (machi) = เมือง' },
+            { char: 'み', romaji: 'mi', thai: 'มิ', type: 'm', mnemonic: 'ตัวみ เหมือนคนนั่งมองน้ำ "มิ" สะท้อน 🪞', example: 'みず (mizu) = น้ำ' },
+            { char: 'む', romaji: 'mu', thai: 'มุ', type: 'm', mnemonic: 'ตัวむ เหมือนวัวที่หันหัวมา "มุ" หน้าวัว 🐄', example: 'むし (mushi) = แมลง' },
+            { char: 'め', romaji: 'me', thai: 'เม', type: 'm', mnemonic: 'ตัวめ เหมือนตา "เม" ตาใหญ่โตมองดู 👁️', example: 'めだか (medaka) = ปลาเมดากะ' },
+            { char: 'も', romaji: 'mo', thai: 'โม', type: 'm', mnemonic: 'ตัวも เหมือนตะขอสองอัน "โม" ตะขอคู่ 🪝🪝', example: 'もり (mori) = ป่า' },
+            // Y row
+            { char: 'や', romaji: 'ya', thai: 'ยะ', type: 'y', mnemonic: 'ตัวや เหมือนรถม้าที่วิ่ง "ยะ" เร็วๆ 🏇', example: 'やま (yama) = ภูเขา' },
+            { char: 'ゆ', romaji: 'yu', thai: 'ยุ', type: 'y', mnemonic: 'ตัวゆ เหมือนปลาที่ว่ายน้ำ "ยุ" ปลาตัวโค้ง 🐠', example: 'ゆき (yuki) = หิมะ' },
+            { char: 'よ', romaji: 'yo', thai: 'โย', type: 'y', mnemonic: 'ตัวよ เหมือนไม้พาย "โย" กวนน้ำ 🚣', example: 'よる (yoru) = กลางคืน' },
+            // R row
+            { char: 'ら', romaji: 'ra', thai: 'ระ', type: 'r', mnemonic: 'ตัวら เหมือนมีดโกนที่งอ "ระ" ระวังคม 🪒', example: 'らいねん (rainen) = ปีหน้า' },
+            { char: 'り', romaji: 'ri', thai: 'ริ', type: 'r', mnemonic: 'ตัวり เหมือนเชือกผูกโบว์สองอัน "ริ" โบว์สวยๆ 🎀', example: 'りんご (ringo) = แอปเปิ้ล' },
+            { char: 'る', romaji: 'ru', thai: 'รุ', type: 'r', mnemonic: 'ตัวる เหมือนงูที่ขดตัว "รุ" งูขดๆ 🐍', example: 'るすばん (rusuban) = เฝ้าบ้าน' },
+            { char: 'れ', romaji: 're', thai: 'เร', type: 'r', mnemonic: 'ตัวれ เหมือนคนโค้งคำนับ "เร" ก้มหัวไหว้ 🙇', example: 'れい (rei) = ศูนย์' },
+            { char: 'ろ', romaji: 'ro', thai: 'โร', type: 'r', mnemonic: 'ตัวろ เหมือนถนนโค้งๆ "โร" ขับรถโรลๆ 🛣️', example: 'ろうか (rouka) = ทางเดิน' },
+            // W row
+            { char: 'わ', romaji: 'wa', thai: 'วะ', type: 'w', mnemonic: 'ตัวわ เหมือนตัว れ แต่ไม่มีหาง "วะ" เหมือน れ ที่ตัดหาง ✂️', example: 'わたし (watashi) = ฉัน' },
+            { char: 'を', romaji: 'wo', thai: 'โว', type: 'w', mnemonic: 'ตัวを อ่านว่า "โว" แต่จริงๆ ออกเสียงเหมือน お ใช้เป็น particle เท่านั้น 🔤', example: 'ほんを (hon wo) = หนังสือ (กรรม)' },
+            { char: 'ん', romaji: 'n', thai: 'น', type: 'special', mnemonic: 'ตัวん เหมือนหนอนที่ขดตัว "น" เหมือนหนอนตัวน้อย 🐛', example: 'にほん (nihon) = ญี่ปุ่น' },
+            // Dakuten
+            { char: 'が', romaji: 'ga', thai: 'กะ', type: 'dakuten', mnemonic: 'か + เครื่องหมายทำให้เป็น が เสียงหนักขึ้น "กะ" 💪', example: 'がっこう (gakkou) = โรงเรียน' },
+            { char: 'ぎ', romaji: 'gi', thai: 'กิ', type: 'dakuten', mnemonic: 'き + dakuten = ぎ เสียง "กิ" หนักขึ้น 🔊', example: 'ぎんこう (ginkou) = ธนาคาร' },
+            { char: 'ぐ', romaji: 'gu', thai: 'กุ', type: 'dakuten', mnemonic: 'く + dakuten = ぐ เสียง "กุ" นุ่มขึ้น 🐋', example: 'ぐあい (guai) = อาการ' },
+            { char: 'げ', romaji: 'ge', thai: 'เก', type: 'dakuten', mnemonic: 'け + dakuten = げ "เก" หนักขึ้น 🎮', example: 'げんき (genki) = สบายดี' },
+            { char: 'ご', romaji: 'go', thai: 'โก', type: 'dakuten', mnemonic: 'こ + dakuten = ご เหมือน "โก" ล่อ 🌟', example: 'ごはん (gohan) = ข้าว' },
+            { char: 'ざ', romaji: 'za', thai: 'ซะ', type: 'dakuten', mnemonic: 'さ + dakuten = ざ เสียง "ซะ" นุ่มขึ้น 🌺', example: 'ざっし (zasshi) = นิตยสาร' },
+            { char: 'じ', romaji: 'ji', thai: 'จิ', type: 'dakuten', mnemonic: 'し + dakuten = じ เสียง "จิ" นุ่มขึ้น 🦋', example: 'じかん (jikan) = เวลา' },
+            { char: 'ず', romaji: 'zu', thai: 'ซุ', type: 'dakuten', mnemonic: 'す + dakuten = ず "ซุ" เป็นเสียงก้อง 🎵', example: 'ずっと (zutto) = ตลอดไป' },
+            { char: 'ぜ', romaji: 'ze', thai: 'เซ', type: 'dakuten', mnemonic: 'せ + dakuten = ぜ "เซ" เสียงก้อง 💫', example: 'ぜんぶ (zenbu) = ทั้งหมด' },
+            { char: 'ぞ', romaji: 'zo', thai: 'โซ', type: 'dakuten', mnemonic: 'そ + dakuten = ぞ "โซ" เสียงก้อง 🌙', example: 'ぞう (zou) = ช้าง' },
+            { char: 'だ', romaji: 'da', thai: 'ดะ', type: 'dakuten', mnemonic: 'た + dakuten = だ "ดะ" เสียงก้อง 🥁', example: 'だいじょうぶ (daijoubu) = ไม่เป็นไร' },
+            { char: 'ぢ', romaji: 'di', thai: 'ดิ', type: 'dakuten', mnemonic: 'ち + dakuten = ぢ "ดิ" เสียงก้อง (ใช้น้อย) 📝', example: 'はなぢ (hanadi) = เลือดกำเดา' },
+            { char: 'づ', romaji: 'du', thai: 'ดุ', type: 'dakuten', mnemonic: 'つ + dakuten = づ "ดุ" เสียงก้อง (ใช้น้อย) 📝', example: 'つづく (tsuzuku) = ต่อเนื่อง' },
+            { char: 'で', romaji: 'de', thai: 'เด', type: 'dakuten', mnemonic: 'て + dakuten = で "เด" เสียงก้อง 🎸', example: 'でんしゃ (densha) = รถไฟ' },
+            { char: 'ど', romaji: 'do', thai: 'โด', type: 'dakuten', mnemonic: 'と + dakuten = ど "โด" เสียงก้อง 🚪', example: 'どこ (doko) = ที่ไหน' },
+            { char: 'ば', romaji: 'ba', thai: 'บะ', type: 'dakuten', mnemonic: 'は + dakuten = ば "บะ" เสียงก้อง 🏀', example: 'ばしょ (basho) = สถานที่' },
+            { char: 'び', romaji: 'bi', thai: 'บิ', type: 'dakuten', mnemonic: 'ひ + dakuten = び "บิ" นุ่มขึ้น 🐝', example: 'びょういん (byouin) = โรงพยาบาล' },
+            { char: 'ぶ', romaji: 'bu', thai: 'บุ', type: 'dakuten', mnemonic: 'ふ + dakuten = ぶ "บุ" เสียงก้อง 🐷', example: 'ぶた (buta) = หมู' },
+            { char: 'べ', romaji: 'be', thai: 'เบ', type: 'dakuten', mnemonic: 'へ + dakuten = べ "เบ" เสียงก้อง 🔔', example: 'べんとう (bentou) = ข้าวกล่อง' },
+            { char: 'ぼ', romaji: 'bo', thai: 'โบ', type: 'dakuten', mnemonic: 'ほ + dakuten = ぼ "โบ" เสียงก้อง ⚫', example: 'ぼくじょう (bokujou) = ฟาร์ม' },
+            { char: 'ぱ', romaji: 'pa', thai: 'ปะ', type: 'dakuten', mnemonic: 'は + handakuten (วงกลม) = ぱ "ปะ" เสียงชัดเจน 🎈', example: 'ぱーてぃ (paati) = ปาร์ตี้' },
+            { char: 'ぴ', romaji: 'pi', thai: 'ปิ', type: 'dakuten', mnemonic: 'ひ + handakuten = ぴ "ปิ" เสียงชัดเจน 🎵', example: 'ぴんく (pinku) = สีชมพู' },
+            { char: 'ぷ', romaji: 'pu', thai: 'ปุ', type: 'dakuten', mnemonic: 'ふ + handakuten = ぷ "ปุ" เสียงชัดเจน 💥', example: 'ぷろ (puro) = โปร' },
+            { char: 'ぺ', romaji: 'pe', thai: 'เป', type: 'dakuten', mnemonic: 'へ + handakuten = ぺ "เป" เสียงชัดเจน 🖊️', example: 'ぺん (pen) = ปากกา' },
+            { char: 'ぽ', romaji: 'po', thai: 'โป', type: 'dakuten', mnemonic: 'ほ + handakuten = ぽ "โป" เสียงชัดเจน 🫧', example: 'ぽけっと (poketto) = กระเป๋า' },
+            // Combination sounds
+            { char: 'きゃ', romaji: 'kya', thai: 'เคียะ', type: 'combo', mnemonic: 'き + ゃ = きゃ เสียงผสม "เคียะ" สั้นๆ 🔗', example: 'きゃく (kyaku) = แขก/ลูกค้า' },
+            { char: 'きゅ', romaji: 'kyu', thai: 'เคียว', type: 'combo', mnemonic: 'き + ゅ = きゅ "เคียว" เสียงผสม 🎯', example: 'きゅうり (kyuuri) = แตงกวา' },
+            { char: 'きょ', romaji: 'kyo', thai: 'เคียว', type: 'combo', mnemonic: 'き + ょ = きょ "เคียว" เสียงผสม 📚', example: 'きょう (kyou) = วันนี้' },
+            { char: 'しゃ', romaji: 'sha', thai: 'ชะ', type: 'combo', mnemonic: 'し + ゃ = しゃ "ชะ" เสียงผสม 🌊', example: 'しゃしん (shashin) = รูปถ่าย' },
+            { char: 'しゅ', romaji: 'shu', thai: 'ชุ', type: 'combo', mnemonic: 'し + ゅ = しゅ "ชุ" เสียงผสม 🎪', example: 'しゅくだい (shukudai) = การบ้าน' },
+            { char: 'しょ', romaji: 'sho', thai: 'โชะ', type: 'combo', mnemonic: 'し + ょ = しょ "โชะ" เสียงผสม 🏪', example: 'しょうがつ (shogatsu) = ปีใหม่ญี่ปุ่น' },
+            { char: 'ちゃ', romaji: 'cha', thai: 'ชะ', type: 'combo', mnemonic: 'ち + ゃ = ちゃ "ชะ" เสียงผสม ☕', example: 'おちゃ (ocha) = ชา' },
+            { char: 'ちゅ', romaji: 'chu', thai: 'ชุ', type: 'combo', mnemonic: 'ち + ゅ = ちゅ "ชุ" เหมือน "จูบ" 💋', example: 'ちゅうごく (chuugoku) = จีน' },
+            { char: 'ちょ', romaji: 'cho', thai: 'โชะ', type: 'combo', mnemonic: 'ち + ょ = ちょ "โชะ" เสียงผสม 🦋', example: 'ちょっと (chotto) = นิดหน่อย' },
+            { char: 'にゃ', romaji: 'nya', thai: 'เนียะ', type: 'combo', mnemonic: 'に + ゃ = にゃ "เนียะ" เสียงแมว 🐱', example: 'にゃんこ (nyanko) = น้องแมว' },
+            { char: 'にゅ', romaji: 'nyu', thai: 'เนียว', type: 'combo', mnemonic: 'に + ゅ = にゅ "เนียว" เสียงผสม 🥛', example: 'にゅうがく (nyuugaku) = เข้าเรียน' },
+            { char: 'にょ', romaji: 'nyo', thai: 'เนียว', type: 'combo', mnemonic: 'に + ょ = にょ "เนียว" เสียงผสม 🌿', example: 'にょろにょろ (nyoronyoro) = เลื้อยๆ' },
+            { char: 'ひゃ', romaji: 'hya', thai: 'เฮียะ', type: 'combo', mnemonic: 'ひ + ゃ = ひゃ "เฮียะ" เสียงผสม 💨', example: 'ひゃく (hyaku) = หนึ่งร้อย' },
+            { char: 'ひゅ', romaji: 'hyu', thai: 'เฮียว', type: 'combo', mnemonic: 'ひ + ゅ = ひゅ "เฮียว" เสียงผสม 🌬️', example: 'ひゅーひゅー (hyuuhyuu) = เสียงลม' },
+            { char: 'ひょ', romaji: 'hyo', thai: 'เฮียว', type: 'combo', mnemonic: 'ひ + ょ = ひょ "เฮียว" เสียงผสม 🐾', example: 'ひょう (hyou) = เสือดาว' },
+            { char: 'みゃ', romaji: 'mya', thai: 'เมียะ', type: 'combo', mnemonic: 'み + ゃ = みゃ "เมียะ" เสียงผสม 🎶', example: 'みゃくはく (myakuhaku) = ชีพจร' },
+            { char: 'みゅ', romaji: 'myu', thai: 'เมียว', type: 'combo', mnemonic: 'み + ゅ = みゅ "เมียว" เสียงผสม 🎵', example: 'みゅーじっく (myuujikku) = ดนตรี' },
+            { char: 'みょ', romaji: 'myo', thai: 'เมียว', type: 'combo', mnemonic: 'み + ょ = みょ "เมียว" เสียงผสม 🌸', example: 'みょうじ (myouji) = นามสกุล' },
+            { char: 'りゃ', romaji: 'rya', thai: 'เรียะ', type: 'combo', mnemonic: 'り + ゃ = りゃ "เรียะ" เสียงผสม 🌟', example: 'りゃくご (ryakugo) = ตัวย่อ' },
+            { char: 'りゅ', romaji: 'ryu', thai: 'ริว', type: 'combo', mnemonic: 'り + ゅ = りゅ "ริว" เหมือนมังกร 🐉', example: 'りゅう (ryuu) = มังกร' },
+            { char: 'りょ', romaji: 'ryo', thai: 'เรียว', type: 'combo', mnemonic: 'り + ょ = りょ "เรียว" เสียงผสม 🏨', example: 'りょこう (ryokou) = การท่องเที่ยว' },
+        ];
+
+        // =====================================================
+        // DATA: Complete Katakana Database
+        // =====================================================
+        const KATAKANA = [
+            { char: 'ア', romaji: 'a', thai: 'อา', type: 'vowel', mnemonic: 'ตัวア เหมือนตัว A ที่หมุนไป "อา" เหมือน A ยักษ์ 🔠', example: 'アイス (aisu) = ไอศกรีม' },
+            { char: 'イ', romaji: 'i', thai: 'อิ', type: 'vowel', mnemonic: 'ตัวイ เหมือนเลข 1 ที่มีขีด "อิ" เส้นตรงๆ 1️⃣', example: 'イタリア (itaria) = อิตาลี' },
+            { char: 'ウ', romaji: 'u', thai: 'อุ', type: 'vowel', mnemonic: 'ตัวウ เหมือนแว่นตาขนาดเล็ก "อุ" แว่นสองตา 👓', example: 'ウール (uuru) = ขนสัตว์' },
+            { char: 'エ', romaji: 'e', thai: 'เอ', type: 'vowel', mnemonic: 'ตัวエ เหมือนตัว I ที่มีแขน "เอ" หุ่นยนต์ 🤖', example: 'エアコン (eakon) = แอร์' },
+            { char: 'オ', romaji: 'o', thai: 'โอ', type: 'vowel', mnemonic: 'ตัวオ เหมือนตัว オ ที่มีขีดตัดกลาง "โอ" ขีดแบ่ง ✂️', example: 'オレンジ (orenji) = ส้ม' },
+            { char: 'カ', romaji: 'ka', thai: 'คะ', type: 'k', mnemonic: 'ตัวカ เหมือนใบพัดลม "คะ" หมุนๆ 🌀', example: 'カメラ (kamera) = กล้อง' },
+            { char: 'キ', romaji: 'ki', thai: 'คิ', type: 'k', mnemonic: 'ตัวキ เหมือนรถไฟ "คิ" รางรถไฟ 🚂', example: 'キッチン (kicchin) = ครัว' },
+            { char: 'ク', romaji: 'ku', thai: 'คุ', type: 'k', mnemonic: 'ตัวク เหมือนปากนกกางปีก "คุ" นกบิน 🐦', example: 'クラス (kurasu) = ชั้นเรียน' },
+            { char: 'ケ', romaji: 'ke', thai: 'เค', type: 'k', mnemonic: 'ตัวケ เหมือนไม้พาย "เค" พายเรือ 🚣', example: 'ケーキ (keeki) = เค้ก' },
+            { char: 'コ', romaji: 'ko', thai: 'โค', type: 'k', mnemonic: 'ตัวコ เหมือนกรอบหน้าต่าง "โค" มองออกไป 🪟', example: 'コーヒー (koohii) = กาแฟ' },
+            { char: 'サ', romaji: 'sa', thai: 'ซะ', type: 's', mnemonic: 'ตัวサ เหมือนคนยกมือ "ซะ" เรียกรถแท็กซี่ 🚕', example: 'サービス (saabisu) = บริการ' },
+            { char: 'シ', romaji: 'shi', thai: 'ชิ', type: 's', mnemonic: 'ตัวシ เหมือนรอยยิ้ม "ชิ" :) ยิ้มสวย 😊', example: 'シャツ (shatsu) = เสื้อ' },
+            { char: 'ス', romaji: 'su', thai: 'ซุ', type: 's', mnemonic: 'ตัวス เหมือนรูปสวอร์ด "ซุ" ดาบมีด้ามจับ ⚔️', example: 'スーパー (suupaa) = ซุปเปอร์มาร์เก็ต' },
+            { char: 'セ', romaji: 'se', thai: 'เซ', type: 's', mnemonic: 'ตัวセ เหมือนนาฬิกาที่ขาดเข็ม "เซ" เวลาหยุด ⏰', example: 'セール (seeru) = เซล/ลดราคา' },
+            { char: 'ソ', romaji: 'so', thai: 'โซ', type: 's', mnemonic: 'ตัวソ เหมือนคนยิ้มสั้นๆ "โซ" รอยยิ้มเล็กๆ 😁', example: 'ソファ (sofa) = โซฟา' },
+            { char: 'タ', romaji: 'ta', thai: 'ตะ', type: 't', mnemonic: 'ตัวタ เหมือนนกที่กางปีก "ตะ" นกบิน 🦅', example: 'タクシー (takushii) = แท็กซี่' },
+            { char: 'チ', romaji: 'chi', thai: 'ชิ', type: 't', mnemonic: 'ตัวチ เหมือนกุ้งมังกร "ชิ" ก้ามแข็ง 🦞', example: 'チョコ (choko) = ช็อกโกแลต' },
+            { char: 'ツ', romaji: 'tsu', thai: 'ซึ', type: 't', mnemonic: 'ตัวツ เหมือนรอยยิ้มที่กว้างกว่า "ซึ" ยิ้มกว้าง 😀', example: 'ツアー (tsuaa) = ทัวร์' },
+            { char: 'テ', romaji: 'te', thai: 'เต', type: 't', mnemonic: 'ตัวテ เหมือนเสาอากาศ TV "เต" รับสัญญาณ 📡', example: 'テレビ (terebi) = โทรทัศน์' },
+            { char: 'ト', romaji: 'to', thai: 'โต', type: 't', mnemonic: 'ตัวト เหมือนเสาที่มีหมุด "โต" ตอกหมุด 🔩', example: 'トイレ (toire) = ห้องน้ำ' },
+            { char: 'ナ', romaji: 'na', thai: 'นะ', type: 'n', mnemonic: 'ตัวナ เหมือนตัวเลข 7 ที่มีขาค้ำ "นะ" เลข 7 ค้ำ 7️⃣', example: 'ナイフ (naifu) = มีด' },
+            { char: 'ニ', romaji: 'ni', thai: 'นิ', type: 'n', mnemonic: 'ตัวニ เหมือนเลข 11 "นิ" เส้นสองอัน 11️⃣', example: 'ニュース (nyuusu) = ข่าว' },
+            { char: 'ヌ', romaji: 'nu', thai: 'นุ', type: 'n', mnemonic: 'ตัวヌ เหมือนหนวดปู "นุ" ปูทะเล 🦀', example: 'ヌードル (nuudoru) = บะหมี่' },
+            { char: 'ネ', romaji: 'ne', thai: 'เน', type: 'n', mnemonic: 'ตัวネ เหมือนตาข่าย "เน็ต" ตาข่ายจับสัตว์ 🕸️', example: 'ネコ (neko) = แมว' },
+            { char: 'ノ', romaji: 'no', thai: 'โน', type: 'n', mnemonic: 'ตัวノ เหมือนเส้นเฉียง "โน" ขีดเส้น ✏️', example: 'ノート (nooto) = สมุดโน้ต' },
+            { char: 'ハ', romaji: 'ha', thai: 'ฮะ', type: 'h', mnemonic: 'ตัวハ เหมือนขา "ฮะ" ขาเดินสองข้าง 🦿', example: 'ハンバーガー (hanbaagaa) = แฮมเบอร์เกอร์' },
+            { char: 'ヒ', romaji: 'hi', thai: 'ฮิ', type: 'h', mnemonic: 'ตัวヒ เหมือนตัว F ที่ขาดขา "ฮิ" ตัว F ที่ถูกตัด ✂️', example: 'ヒーロー (hiiroo) = ฮีโร่' },
+            { char: 'フ', romaji: 'fu', thai: 'ฟุ', type: 'h', mnemonic: 'ตัวフ เหมือนขอเบ็ด "ฟุ" ตกปลา 🎣', example: 'フルーツ (furuutsu) = ผลไม้' },
+            { char: 'ヘ', romaji: 'he', thai: 'เฮ', type: 'h', mnemonic: 'ตัวヘ เหมือนภูเขา "เฮ" ปีนขึ้นเขา ⛰️', example: 'ヘルメット (herumetto) = หมวกกันน็อก' },
+            { char: 'ホ', romaji: 'ho', thai: 'โฮ', type: 'h', mnemonic: 'ตัวホ เหมือนไม้กางเขน "โฮ" เสาสี่ขา ✝️', example: 'ホテル (hoteru) = โรงแรม' },
+            { char: 'マ', romaji: 'ma', thai: 'มะ', type: 'm', mnemonic: 'ตัวマ เหมือนม้าที่กางหน้า "มะ" ม้าน่ารัก 🐴', example: 'マクドナルド (makudonarudo) = แมคโดนัลด์' },
+            { char: 'ミ', romaji: 'mi', thai: 'มิ', type: 'm', mnemonic: 'ตัวミ เหมือนขีดสามขีด "มิ" เส้นสาม 🎵', example: 'ミルク (miruku) = นม' },
+            { char: 'ム', romaji: 'mu', thai: 'มุ', type: 'm', mnemonic: 'ตัวム เหมือนรูปหน้าวัว "มุ" วัวมองหน้า 🐮', example: 'ムービー (muubii) = หนัง' },
+            { char: 'メ', romaji: 'me', thai: 'เม', type: 'm', mnemonic: 'ตัวメ เหมือน X ขนาดใหญ่ "เม" ผิดข้ามออก ❌', example: 'メニュー (menyuu) = เมนู' },
+            { char: 'モ', romaji: 'mo', thai: 'โม', type: 'm', mnemonic: 'ตัวモ เหมือนตะขอสองอัน "โม" ตะขอคู่ 🪝🪝', example: 'モデル (moderu) = นางแบบ' },
+            { char: 'ヤ', romaji: 'ya', thai: 'ยะ', type: 'y', mnemonic: 'ตัวヤ เหมือนสถานีรถไฟ "ยะ" รถออก 🚂', example: 'ヤクルト (yakuruto) = ยาคูลท์' },
+            { char: 'ユ', romaji: 'yu', thai: 'ยุ', type: 'y', mnemonic: 'ตัวユ เหมือนกีต้าร์ "ยุ" ดีดกีต้าร์ 🎸', example: 'ユーチューブ (yuuchuubu) = YouTube' },
+            { char: 'ヨ', romaji: 'yo', thai: 'โย', type: 'y', mnemonic: 'ตัวヨ เหมือนตู้ "โย" ตู้สามชั้น 🗄️', example: 'ヨーグルト (yooguruto) = โยเกิร์ต' },
+            { char: 'ラ', romaji: 'ra', thai: 'ระ', type: 'r', mnemonic: 'ตัวラ เหมือนไม้ขีดไฟ "ระ" ไฟลุก 🔥', example: 'ラーメン (raamen) = ราเมน' },
+            { char: 'リ', romaji: 'ri', thai: 'ริ', type: 'r', mnemonic: 'ตัวリ เหมือนเสาสองต้น "ริ" ยืนตรง 🏛️', example: 'リモコン (rimokon) = รีโมต' },
+            { char: 'ル', romaji: 'ru', thai: 'รุ', type: 'r', mnemonic: 'ตัวル เหมือนรองเท้าสองข้าง "รุ" เดินเดินๆ 👟', example: 'ルール (ruuru) = กฎ' },
+            { char: 'レ', romaji: 're', thai: 'เร', type: 'r', mnemonic: 'ตัวレ เหมือนขาคนที่เดิน "เร" ก้าวๆ 🦵', example: 'レストラン (resutoran) = ร้านอาหาร' },
+            { char: 'ロ', romaji: 'ro', thai: 'โร', type: 'r', mnemonic: 'ตัวロ เหมือนหน้าต่างสี่เหลี่ยม "โร" กรอบสี่เหลี่ยม 🪟', example: 'ロボット (robotto) = หุ่นยนต์' },
+            { char: 'ワ', romaji: 'wa', thai: 'วะ', type: 'w', mnemonic: 'ตัวワ เหมือนคน chill เอนตัว "วะ" ผ่อนคลาย 😎', example: 'ワイン (wain) = ไวน์' },
+            { char: 'ヲ', romaji: 'wo', thai: 'โว', type: 'w', mnemonic: 'ตัวヲ "โว" ใช้เป็น particle ในภาษาทางการ 📜', example: 'ほんヲ (hon wo) = หนังสือ' },
+            { char: 'ン', romaji: 'n', thai: 'น', type: 'special', mnemonic: 'ตัวン เหมือนตัว ソ ที่คล้ายกัน แต่เอียงกว่า "น" ระวังสับสนกับ ソ! 😅', example: 'アイスクリーン (aisukuriin) = ไอศกรีม' },
+            // Dakuten
+            { char: 'ガ', romaji: 'ga', thai: 'กะ', type: 'dakuten', mnemonic: 'カ + dakuten = ガ "กะ" เสียงก้อง 🎮', example: 'ガム (gamu) = หมากฝรั่ง' },
+            { char: 'ギ', romaji: 'gi', thai: 'กิ', type: 'dakuten', mnemonic: 'キ + dakuten = ギ "กิ" เสียงก้อง 🎸', example: 'ギター (gitaa) = กีตาร์' },
+            { char: 'グ', romaji: 'gu', thai: 'กุ', type: 'dakuten', mnemonic: 'ク + dakuten = グ "กุ" เสียงก้อง 🍇', example: 'グラス (gurasu) = แก้วน้ำ' },
+            { char: 'ゲ', romaji: 'ge', thai: 'เก', type: 'dakuten', mnemonic: 'ケ + dakuten = ゲ "เก" เสียงก้อง 🎮', example: 'ゲーム (geemu) = เกม' },
+            { char: 'ゴ', romaji: 'go', thai: 'โก', type: 'dakuten', mnemonic: 'コ + dakuten = ゴ "โก" เสียงก้อง ⛳', example: 'ゴルフ (gorufu) = กอล์ฟ' },
+            { char: 'ザ', romaji: 'za', thai: 'ซะ', type: 'dakuten', mnemonic: 'サ + dakuten = ザ "ซะ" เสียงก้อง 🌸', example: 'ザ・ベスト (za besuto) = The Best' },
+            { char: 'ジ', romaji: 'ji', thai: 'จิ', type: 'dakuten', mnemonic: 'シ + dakuten = ジ "จิ" เสียงก้อง 🎯', example: 'ジュース (juusu) = น้ำผลไม้' },
+            { char: 'ズ', romaji: 'zu', thai: 'ซุ', type: 'dakuten', mnemonic: 'ス + dakuten = ズ "ซุ" เสียงก้อง 🔊', example: 'ズボン (zubon) = กางเกง' },
+            { char: 'ゼ', romaji: 'ze', thai: 'เซ', type: 'dakuten', mnemonic: 'セ + dakuten = ゼ "เซ" เสียงก้อง 0️⃣', example: 'ゼロ (zero) = ศูนย์' },
+            { char: 'ゾ', romaji: 'zo', thai: 'โซ', type: 'dakuten', mnemonic: 'ソ + dakuten = ゾ "โซ" เสียงก้อง 🧟', example: 'ゾンビ (zonbi) = ซอมบี้' },
+            { char: 'ダ', romaji: 'da', thai: 'ดะ', type: 'dakuten', mnemonic: 'タ + dakuten = ダ "ดะ" เสียงก้อง 💃', example: 'ダンス (dansu) = เต้นรำ' },
+            { char: 'ヂ', romaji: 'di', thai: 'ดิ', type: 'dakuten', mnemonic: 'チ + dakuten = ヂ "ดิ" เสียงก้อง (ใช้น้อย) 📝', example: '' },
+            { char: 'ヅ', romaji: 'du', thai: 'ดุ', type: 'dakuten', mnemonic: 'ツ + dakuten = ヅ "ดุ" เสียงก้อง (ใช้น้อย) 📝', example: '' },
+            { char: 'デ', romaji: 'de', thai: 'เด', type: 'dakuten', mnemonic: 'テ + dakuten = デ "เด" เสียงก้อง 🖥️', example: 'デパート (depaato) = ห้างสรรพสินค้า' },
+            { char: 'ド', romaji: 'do', thai: 'โด', type: 'dakuten', mnemonic: 'ト + dakuten = ド "โด" เสียงก้อง 🚪', example: 'ドア (doa) = ประตู' },
+            { char: 'バ', romaji: 'ba', thai: 'บะ', type: 'dakuten', mnemonic: 'ハ + dakuten = バ "บะ" เสียงก้อง 🚌', example: 'バス (basu) = รถบัส' },
+            { char: 'ビ', romaji: 'bi', thai: 'บิ', type: 'dakuten', mnemonic: 'ヒ + dakuten = ビ "บิ" เสียงก้อง 🍺', example: 'ビール (biiru) = เบียร์' },
+            { char: 'ブ', romaji: 'bu', thai: 'บุ', type: 'dakuten', mnemonic: 'フ + dakuten = ブ "บุ" เสียงก้อง 🔵', example: 'ブルー (buruu) = สีน้ำเงิน' },
+            { char: 'ベ', romaji: 'be', thai: 'เบ', type: 'dakuten', mnemonic: 'ヘ + dakuten = ベ "เบ" เสียงก้อง 🛏️', example: 'ベッド (beddo) = เตียง' },
+            { char: 'ボ', romaji: 'bo', thai: 'โบ', type: 'dakuten', mnemonic: 'ホ + dakuten = ボ "โบ" เสียงก้อง ⚽', example: 'ボール (booru) = ลูกบอล' },
+            { char: 'パ', romaji: 'pa', thai: 'ปะ', type: 'dakuten', mnemonic: 'ハ + handakuten = パ "ปะ" เสียงชัดเจน 🎉', example: 'パーティー (paatii) = ปาร์ตี้' },
+            { char: 'ピ', romaji: 'pi', thai: 'ปิ', type: 'dakuten', mnemonic: 'ヒ + handakuten = ピ "ปิ" เสียงชัดเจน 🍕', example: 'ピザ (piza) = พิซซ่า' },
+            { char: 'プ', romaji: 'pu', thai: 'ปุ', type: 'dakuten', mnemonic: 'フ + handakuten = プ "ปุ" เสียงชัดเจน 🏊', example: 'プール (puuru) = สระว่ายน้ำ' },
+            { char: 'ペ', romaji: 'pe', thai: 'เป', type: 'dakuten', mnemonic: 'ヘ + handakuten = ペ "เป" เสียงชัดเจน 🐧', example: 'ペンギン (pengin) = เพนกวิน' },
+            { char: 'ポ', romaji: 'po', thai: 'โป', type: 'dakuten', mnemonic: 'ホ + handakuten = ポ "โป" เสียงชัดเจน 📮', example: 'ポスト (posuto) = ตู้ไปรษณีย์' },
+            // Combination sounds
+            { char: 'キャ', romaji: 'kya', thai: 'เคียะ', type: 'combo', mnemonic: 'キ + ャ = キャ "เคียะ" เสียงผสม 🎠', example: 'キャンパス (kyanpasu) = แคมปัส' },
+            { char: 'キュ', romaji: 'kyu', thai: 'เคียว', type: 'combo', mnemonic: 'キ + ュ = キュ "เคียว" เสียงผสม 🐰', example: 'キュート (kyuuto) = น่ารัก' },
+            { char: 'キョ', romaji: 'kyo', thai: 'เคียว', type: 'combo', mnemonic: 'キ + ョ = キョ "เคียว" เสียงผสม 🎭', example: 'キョウト (kyouto) = เกียวโต' },
+            { char: 'シャ', romaji: 'sha', thai: 'ชะ', type: 'combo', mnemonic: 'シ + ャ = シャ "ชะ" เสียงผสม 🚿', example: 'シャワー (shawaa) = ฝักบัว' },
+            { char: 'シュ', romaji: 'shu', thai: 'ชุ', type: 'combo', mnemonic: 'シ + ュ = シュ "ชุ" เสียงผสม 🍰', example: 'シュークリーム (shuukuriimu) = ชูครีม' },
+            { char: 'ショ', romaji: 'sho', thai: 'โชะ', type: 'combo', mnemonic: 'シ + ョ = ショ "โชะ" เสียงผสม 🛍️', example: 'ショッピング (shoppingu) = ช้อปปิ้ง' },
+            { char: 'チャ', romaji: 'cha', thai: 'ชะ', type: 'combo', mnemonic: 'チ + ャ = チャ "ชะ" เสียงผสม 🍵', example: 'チャンネル (channeru) = ช่องทีวี' },
+            { char: 'チュ', romaji: 'chu', thai: 'ชุ', type: 'combo', mnemonic: 'チ + ュ = チュ "ชุ" เสียงผสม 🖥️', example: 'チューブ (chuubu) = ท่อ/ยูทูบ' },
+            { char: 'チョ', romaji: 'cho', thai: 'โชะ', type: 'combo', mnemonic: 'チ + ョ = チョ "โชะ" เสียงผสม 🍫', example: 'チョコレート (chokoreeto) = ช็อกโกแลต' },
+            { char: 'ニャ', romaji: 'nya', thai: 'เนียะ', type: 'combo', mnemonic: 'ニ + ャ = ニャ "เนียะ" เสียงแมว 🐱', example: 'ニャン (nyan) = เสียงแมว' },
+            { char: 'ニュ', romaji: 'nyu', thai: 'เนียว', type: 'combo', mnemonic: 'ニ + ュ = ニュ "เนียว" เสียงผสม 📰', example: 'ニュース (nyuusu) = ข่าว' },
+            { char: 'ニョ', romaji: 'nyo', thai: 'เนียว', type: 'combo', mnemonic: 'ニ + ョ = ニョ "เนียว" เสียงผสม 🌿', example: 'ニョロ (nyoro) = เลื้อยๆ' },
+            { char: 'ヒャ', romaji: 'hya', thai: 'เฮียะ', type: 'combo', mnemonic: 'ヒ + ャ = ヒャ "เฮียะ" เสียงผสม 💫', example: 'ヒャク (hyaku) = หนึ่งร้อย' },
+            { char: 'ヒュ', romaji: 'hyu', thai: 'เฮียว', type: 'combo', mnemonic: 'ヒ + ュ = ヒュ "เฮียว" เสียงผสม 🌬️', example: 'ヒューズ (hyuuzu) = ฟิวส์' },
+            { char: 'ヒョ', romaji: 'hyo', thai: 'เฮียว', type: 'combo', mnemonic: 'ヒ + ョ = ヒョ "เฮียว" เสียงผสม 🐆', example: 'ヒョウ (hyou) = เสือดาว' },
+            { char: 'ミャ', romaji: 'mya', thai: 'เมียะ', type: 'combo', mnemonic: 'ミ + ャ = ミャ "เมียะ" เสียงผสม 🌺', example: 'ミャンマー (myanmaa) = เมียนมา' },
+            { char: 'ミュ', romaji: 'myu', thai: 'เมียว', type: 'combo', mnemonic: 'ミ + ュ = ミュ "เมียว" เสียงผสม 🎵', example: 'ミュージック (myuujikku) = ดนตรี' },
+            { char: 'ミョ', romaji: 'myo', thai: 'เมียว', type: 'combo', mnemonic: 'ミ + ョ = ミョ "เมียว" เสียงผสม 🌸', example: 'ミョウガ (myouga) = ขิงฤดู' },
+            { char: 'リャ', romaji: 'rya', thai: 'เรียะ', type: 'combo', mnemonic: 'リ + ャ = リャ "เรียะ" เสียงผสม ⭐', example: 'リャクゴ (ryakugo) = ตัวย่อ' },
+            { char: 'リュ', romaji: 'ryu', thai: 'ริว', type: 'combo', mnemonic: 'リ + ュ = リュ "ริว" มังกรบิน 🐉', example: 'リュック (ryukku) = เป้สะพาย' },
+            { char: 'リョ', romaji: 'ryo', thai: 'เรียว', type: 'combo', mnemonic: 'リ + ョ = リョ "เรียว" เสียงผสม 🏨', example: 'リョコウ (ryokou) = ท่องเที่ยว' },
+        ];
+
+        // =====================================================
+        // STATE MANAGEMENT
+        // =====================================================
+        let state = {
+            xp: 0, level: 1, streak: 0, lastDate: null,
+            learnedHira: [], learnedKata: [],
+            hardHira: [], hardKata: [],
+            settings: { audio: true, romaji: true, particles: true, sr: true },
+            achievements: {},
+            quizBest: 0,
+            memBest: 999,
+        };
+
+        function loadState() {
+            const s = localStorage.getItem('harunaState');
+            if (s) { try { state = { ...state, ...JSON.parse(s) }; } catch (e) { } }
+            checkStreak();
+        }
+        function saveState() {
+            localStorage.setItem('harunaState', JSON.stringify(state));
+        }
+        function checkStreak() {
+            const today = new Date().toDateString();
+            if (state.lastDate !== today) {
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+                if (state.lastDate === yesterday) { state.streak++; }
+                else if (state.lastDate !== today) { state.streak = 1; }
+                state.lastDate = today;
+                saveState();
+            }
+        }
+        function addXP(amount) {
+            state.xp += amount;
+            const xpNeeded = state.level * 100;
+            if (state.xp >= xpNeeded) {
+                state.xp -= xpNeeded;
+                state.level++;
+                setTimeout(() => showLevelup(state.level), 300);
+            }
+            saveState();
+            updateUI();
+            showXPPopup('+' + amount + ' XP');
+            checkAchievements();
+        }
+        function updateUI() {
+            const el = (id) => document.getElementById(id);
+            if (el('navXP')) el('navXP').textContent = state.xp;
+            if (el('streakCount')) el('streakCount').textContent = state.streak;
+            if (el('statXP')) el('statXP').textContent = state.xp;
+            if (el('statStreak')) el('statStreak').textContent = state.streak;
+            const learned = state.learnedHira.length + state.learnedKata.length;
+            if (el('statLearned')) el('statLearned').textContent = learned;
+            if (el('userLevel')) el('userLevel').textContent = state.level;
+            const xpNeed = state.level * 100;
+            const pct = Math.min((state.xp / xpNeed) * 100, 100);
+            if (el('xpFill')) el('xpFill').style.width = pct + '%';
+            if (el('xpProgress')) el('xpProgress').textContent = state.xp + ' / ' + xpNeed + ' XP';
+            // Progress bars
+            const hp = Math.round(state.learnedHira.length / 46 * 100);
+            const kp = Math.round(state.learnedKata.length / 46 * 100);
+            if (el('hiraProgFill')) el('hiraProgFill').style.width = hp + '%';
+            if (el('kataProgFill')) el('kataProgFill').style.width = kp + '%';
+            if (el('progHira')) el('progHira').textContent = state.learnedHira.length + '/46';
+            if (el('progKata')) el('progKata').textContent = state.learnedKata.length + '/46';
+            const weakCount = state.hardHira.length + state.hardKata.length;
+            if (el('progWeak')) el('progWeak').textContent = weakCount;
+            // Progress ring
+            const overall = Math.round(learned / (HIRAGANA.length + KATAKANA.length) * 100);
+            if (el('progPct')) el('progPct').textContent = overall + '%';
+            const circle = el('progCircle');
+            if (circle) { const offset = 201 - (201 * overall / 100); circle.style.strokeDashoffset = offset; }
+        }
+
+        // =====================================================
+        // NAVIGATION
+        // =====================================================
+        function showPage(name) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            const pg = document.getElementById('page-' + name);
+            if (pg) pg.classList.add('active');
+            const tb = document.querySelector(`.tab-btn[data-page="${name}"]`);
+            if (tb) tb.classList.add('active');
+            // Page init
+            if (name === 'hiragana') renderKanaGrid('hira', 'all');
+            if (name === 'katakana') renderKanaGrid('kata', 'all');
+            if (name === 'flashcards') initFC();
+            if (name === 'writing') initWriting();
+            if (name === 'memory') { document.getElementById('memoryMenu').style.display = ''; document.getElementById('memoryGame').style.display = 'none'; }
+            if (name === 'quiz') { document.getElementById('quizMenu').style.display = ''; document.getElementById('quizGame').style.display = 'none'; document.getElementById('quizResult').style.display = 'none'; }
+            if (name === 'conversation') initConversation();
+            if (name === 'progress') { renderAchievements(); renderMissions(); updateUI(); }
+            window.scrollTo(0, 0);
+        }
+
+        // =====================================================
+        // PARTICLES
+        // =====================================================
+        function initParticles() {
+            if (!state.settings.particles) return;
+            const container = document.getElementById('particles');
+            const chars = ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'ア', 'イ', 'ウ', 'さ', 'な', 'は'];
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 20 + 10;
+                p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random() * 100}%;
+      animation-duration:${Math.random() * 20 + 15}s;animation-delay:${Math.random() * 20}s;
+      background:hsl(${Math.random() * 60 + 300},80%,70%);opacity:0.1;font-size:${size}px;
+      border-radius:50%;color:rgba(255,255,255,0.3);`;
+                if (Math.random() > 0.5) {
+                    p.textContent = chars[Math.floor(Math.random() * chars.length)];
+                    p.style.background = 'transparent';
+                    p.style.opacity = '0.15';
+                    p.style.fontFamily = "'Noto Sans JP',sans-serif";
+                }
+                container.appendChild(p);
+            }
+        }
+
+        // =====================================================
+        // KANA GRID RENDERING
+        // =====================================================
+        function renderKanaGrid(type, filter) {
+            const data = type === 'hira' ? HIRAGANA : KATAKANA;
+            const learned = type === 'hira' ? state.learnedHira : state.learnedKata;
+            const hard = type === 'hira' ? state.hardHira : state.hardKata;
+            const gridEl = document.getElementById(type === 'hira' ? 'hiraGrid' : 'kataGrid');
+            const filtered = filter === 'all' ? data : data.filter(c => c.type === filter);
+            gridEl.innerHTML = filtered.map(c => `
+    <div class="kana-cell ${learned.includes(c.char) ? 'learned' : ''} ${hard.includes(c.char) ? 'hard' : ''}" onclick="openKanaModal('${c.char}','${type}')">
+      <span class="kc">${c.char}</span>
+      ${state.settings.romaji ? `<span class="kr">${c.romaji}</span>` : ''}
+    </div>
+  `).join('');
+        }
+
+        function filterHira(f, btn) {
+            document.querySelectorAll('#hiraFilter .type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderKanaGrid('hira', f);
+        }
+        function filterKata(f, btn) {
+            document.querySelectorAll('#kataFilter .type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderKanaGrid('kata', f);
+        }
+
+        // =====================================================
+        // KANA MODAL
+        // =====================================================
+        let currentModalChar = null;
+        let currentModalType = null;
+        function openKanaModal(char, type) {
+            const data = type === 'hira' ? HIRAGANA : KATAKANA;
+            const c = data.find(x => x.char === char);
+            if (!c) return;
+            currentModalChar = c;
+            currentModalType = type;
+            document.getElementById('modalChar').textContent = c.char;
+            document.getElementById('modalRomaji').textContent = c.romaji;
+            document.getElementById('modalThai').textContent = c.thai;
+            document.getElementById('modalMnemonic').textContent = '💡 ' + c.mnemonic;
+            document.getElementById('modalExample').textContent = '📝 ' + c.example;
+            document.getElementById('kanaModal').classList.add('active');
+            if (state.settings.audio) speakCharWithExample(c.char, c.example);
+        }
+        function closeModal() {
+            document.getElementById('kanaModal').classList.remove('active');
+        }
+        function speakModal() {
+            if (currentModalChar) speakCharWithExample(currentModalChar.char, currentModalChar.example);
+        }
+        function markModalLearned() {
+            if (!currentModalChar) return;
+            const arr = currentModalType === 'hira' ? state.learnedHira : state.learnedKata;
+            if (!arr.includes(currentModalChar.char)) { arr.push(currentModalChar.char); saveState(); addXP(5); }
+            closeModal();
+            const type = currentModalType;
+            renderKanaGrid(type, 'all');
+        }
+        function goWriteChar() {
+            closeModal();
+            showPage('writing');
+            if (currentModalChar) setWriteCharByChar(currentModalChar);
+        }
+
+        // =====================================================
+        // SPEECH SYNTHESIS
+        // =====================================================
+        // =====================================================
+        // SPEECH SYNTHESIS — ใช้ตัวอักษรญี่ปุ่นจริง ไม่ใช่ romaji
+        // =====================================================
+        let voices = [];
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+        }
+        if (window.speechSynthesis) {
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        function getJapaneseVoice() {
+            // เลือก voice ภาษาญี่ปุ่นที่ดีที่สุดที่มี
+            const jaVoices = voices.filter(v => v.lang && v.lang.startsWith('ja'));
+            // ลำดับความสำคัญ: Google > Microsoft > native
+            const preferred = jaVoices.find(v => /google/i.test(v.name)) ||
+                jaVoices.find(v => /microsoft/i.test(v.name)) ||
+                jaVoices.find(v => v.localService) ||
+                jaVoices[0] || null;
+            return preferred;
+        }
+
+        function speakJapanese(japaneseChar) {
+            if (!state.settings.audio) return;
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+
+            const u = new SpeechSynthesisUtterance(japaneseChar);
+            u.lang = 'ja-JP';
+            u.rate = 0.7;   // ช้าลงเพื่อความชัดเจน
+            u.pitch = 1.0;
+            u.volume = 1.0;
+
+            const voice = getJapaneseVoice();
+            if (voice) u.voice = voice;
+
+            window.speechSynthesis.speak(u);
+        }
+
+        // พูดตัวอักษรพร้อม example word เพื่อเสริมความเข้าใจ
+        function speakCharWithExample(char, exampleWord) {
+            if (!state.settings.audio) return;
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+
+            const voice = getJapaneseVoice();
+
+            // พูดตัวอักษรก่อน
+            const u1 = new SpeechSynthesisUtterance(char);
+            u1.lang = 'ja-JP';
+            u1.rate = 0.6;
+            u1.pitch = 1.0;
+            u1.volume = 1.0;
+            if (voice) u1.voice = voice;
+
+            window.speechSynthesis.speak(u1);
+
+            // ถ้ามี example word พูดตามหลังจาก 800ms
+            if (exampleWord) {
+                // ดึงแค่ตัวอักษรญี่ปุ่นจาก example string เช่น "あめ (ame) = ฝน" → "あめ"
+                const jpMatch = exampleWord.match(/^([^\s(（]+)/);
+                if (jpMatch) {
+                    const u2 = new SpeechSynthesisUtterance(jpMatch[1]);
+                    u2.lang = 'ja-JP';
+                    u2.rate = 0.7;
+                    u2.pitch = 1.0;
+                    u2.volume = 1.0;
+                    if (voice) u2.voice = voice;
+                    setTimeout(() => window.speechSynthesis.speak(u2), 900);
+                }
+            }
+        }
+
+        // =====================================================
+        // FLASHCARD SYSTEM
+        // =====================================================
+        let fcDeck = [];
+        let fcIndex = 0;
+        let fcType = 'all';
+        let fcFlipped = false;
+
+        function setFCType(type, btn) {
+            document.querySelectorAll('.type-selector .type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            fcType = type;
+            initFC();
+        }
+
+        function buildFCDeck() {
+            let cards = [];
+            if (fcType === 'all' || fcType === 'hiragana') cards = [...cards, ...HIRAGANA.map(c => ({ ...c, script: 'ฮิรางานะ' }))];
+            if (fcType === 'all' || fcType === 'katakana') cards = [...cards, ...KATAKANA.map(c => ({ ...c, script: 'คาตาคานะ' }))];
+            if (fcType === 'weak') {
+                const wh = HIRAGANA.filter(c => state.hardHira.includes(c.char)).map(c => ({ ...c, script: 'ฮิรางานะ' }));
+                const wk = KATAKANA.filter(c => state.hardKata.includes(c.char)).map(c => ({ ...c, script: 'คาตาคานะ' }));
+                cards = [...wh, ...wk];
+                if (cards.length === 0) cards = [...HIRAGANA.slice(0, 10).map(c => ({ ...c, script: 'ฮิรางานะ' }))];
+            }
+            // Spaced repetition: put hard chars first
+            if (state.settings.sr) {
+                const hard = cards.filter(c => state.hardHira.includes(c.char) || state.hardKata.includes(c.char));
+                const rest = cards.filter(c => !state.hardHira.includes(c.char) && !state.hardKata.includes(c.char));
+                cards = [...hard, ...hard, ...rest]; // hard chars appear 2x more
+            }
+            return shuffle(cards);
+        }
+
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; }
+            return a;
+        }
+
+        function initFC() {
+            fcDeck = buildFCDeck();
+            fcIndex = 0;
+            fcFlipped = false;
+            renderFC();
+        }
+
+        function renderFC() {
+            if (fcDeck.length === 0) return;
+            const c = fcDeck[fcIndex];
+            const card = document.getElementById('flashcard');
+            card.classList.remove('flipped');
+            fcFlipped = false;
+            document.getElementById('fcChar').textContent = c.char;
+            document.getElementById('fcTypeLabel').textContent = c.script || '';
+            document.getElementById('fcRomaji').textContent = c.romaji;
+            document.getElementById('fcThai').textContent = c.thai;
+            document.getElementById('fcHint').textContent = '💡 ' + c.mnemonic;
+            document.getElementById('fcExample').textContent = '📝 ' + c.example;
+            document.getElementById('fcCurrent').textContent = fcIndex + 1;
+            document.getElementById('fcTotal').textContent = fcDeck.length;
+            const pct = ((fcIndex + 1) / fcDeck.length) * 100;
+            document.getElementById('fcProgFill').style.width = pct + '%';
+            if (state.settings.audio) setTimeout(() => speakCharWithExample(c.char, c.example), 300);
+        }
+
+        function flipFC() {
+            const card = document.getElementById('flashcard');
+            fcFlipped = !fcFlipped;
+            if (fcFlipped) {
+                card.classList.add('flipped');
+                // ออกเสียงตัวอักษรจริงเมื่อพลิกการ์ด
+                if (fcDeck[fcIndex]) speakJapanese(fcDeck[fcIndex].char);
+                addXP(1);
+            } else {
+                card.classList.remove('flipped');
+            }
+        }
+
+        function nextFC() {
+            fcIndex = (fcIndex + 1) % fcDeck.length;
+            renderFC();
+        }
+
+        function markFC(difficulty) {
+            const c = fcDeck[fcIndex];
+            if (!c) return;
+            const isHira = HIRAGANA.some(x => x.char === c.char);
+            const learnedArr = isHira ? state.learnedHira : state.learnedKata;
+            const hardArr = isHira ? state.hardHira : state.hardKata;
+            if (difficulty === 'easy') {
+                if (!learnedArr.includes(c.char)) learnedArr.push(c.char);
+                const hi = hardArr.indexOf(c.char);
+                if (hi > -1) hardArr.splice(hi, 1);
+                addXP(10);
+            } else {
+                if (!hardArr.includes(c.char)) hardArr.push(c.char);
+                const li = learnedArr.indexOf(c.char);
+                if (li > -1) learnedArr.splice(li, 1);
+                addXP(2);
+            }
+            saveState();
+            nextFC();
+        }
+
+        function speakCurrentFC() {
+            if (fcDeck[fcIndex]) speakCharWithExample(fcDeck[fcIndex].char, fcDeck[fcIndex].example);
+        }
+
+        // =====================================================
+        // WRITING PRACTICE
+        // =====================================================
+        let drawCanvas, ctx, drawing = false, writeType = 'hiragana';
+        let currentWriteChar = HIRAGANA[0];
+        let guideOpacity = 0.15;
+
+        function initWriting() {
+            drawCanvas = document.getElementById('drawCanvas');
+            ctx = drawCanvas.getContext('2d');
+            renderWriteSelectGrid();
+            setWriteChar(currentWriteChar);
+            setupCanvas();
+        }
+
+        function setupCanvas() {
+            if (!drawCanvas) return;
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#ff6b9d';
+
+            const getPos = (e) => {
+                const rect = drawCanvas.getBoundingClientRect();
+                const touch = e.touches ? e.touches[0] : e;
+                return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+            };
+
+            drawCanvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
+            drawCanvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
+            drawCanvas.addEventListener('mouseup', () => drawing = false);
+            drawCanvas.addEventListener('mouseleave', () => drawing = false);
+            drawCanvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
+            drawCanvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
+            drawCanvas.addEventListener('touchend', () => drawing = false);
+        }
+
+        function setWriteType(type, btn) {
+            document.querySelectorAll('#page-writing .type-selector .type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            writeType = type;
+            currentWriteChar = (type === 'hiragana' ? HIRAGANA : KATAKANA)[0];
+            renderWriteSelectGrid();
+            setWriteChar(currentWriteChar);
+        }
+
+        function renderWriteSelectGrid() {
+            const data = writeType === 'hiragana' ? HIRAGANA : KATAKANA;
+            const gridEl = document.getElementById('writeSelectGrid');
+            if (!gridEl) return;
+            gridEl.innerHTML = data.slice(0, 50).map(c => `
+    <div class="kana-cell" onclick="selectWriteChar('${c.char}')">
+      <span class="kc">${c.char}</span>
+      <span class="kr">${c.romaji}</span>
+    </div>
+  `).join('');
+        }
+
+        function selectWriteChar(char) {
+            const data = writeType === 'hiragana' ? HIRAGANA : KATAKANA;
+            const c = data.find(x => x.char === char);
+            if (c) setWriteChar(c);
+        }
+
+        function setWriteCharByChar(c) {
+            currentWriteChar = c;
+            const wd = document.getElementById('writeChar');
+            const wr = document.getElementById('writeRomaji');
+            const wt = document.getElementById('writeThai');
+            const wm = document.getElementById('writeMnemonic');
+            if (wd) wd.textContent = c.char;
+            if (wr) wr.textContent = c.romaji;
+            if (wt) wt.textContent = c.thai;
+            if (wm) wm.textContent = c.mnemonic;
+            clearCanvas();
+            drawGuide();
+        }
+
+        function setWriteChar(c) {
+            currentWriteChar = c;
+            setWriteCharByChar(c);
+        }
+
+        function drawGuide() {
+            if (!ctx || !drawCanvas) return;
+            ctx.save();
+            ctx.globalAlpha = guideOpacity;
+            ctx.font = '120px "Noto Sans JP"';
+            ctx.fillStyle = '#b39ddb';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(currentWriteChar.char, drawCanvas.width / 2, drawCanvas.height / 2);
+            ctx.restore();
+        }
+
+        function clearCanvas() {
+            if (!ctx || !drawCanvas) return;
+            ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+            drawGuide();
+        }
+
+        function nextWriteChar() {
+            const data = writeType === 'hiragana' ? HIRAGANA : KATAKANA;
+            const idx = data.findIndex(c => c.char === currentWriteChar.char);
+            const next = data[(idx + 1) % data.length];
+            setWriteChar(next);
+            addXP(3);
+        }
+
+        function checkWriting() {
+            clearCanvas();
+            ctx.save();
+            ctx.globalAlpha = 0.4;
+            ctx.font = '120px "Noto Sans JP"';
+            ctx.fillStyle = '#69f0ae';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(currentWriteChar.char, drawCanvas.width / 2, drawCanvas.height / 2);
+            ctx.restore();
+            addXP(5);
+            showXPPopup('+5 XP ✍️');
+        }
+
+        // =====================================================
+        // QUIZ SYSTEM
+        // =====================================================
+        let quizType = 'char2romaji';
+        let quizScope = 'all';
+        let quizDeck = [];
+        let quizIndex = 0;
+        let quizScore = 0;
+        let quizCombo = 0;
+        let quizTimer = 30;
+        let quizTimerInterval = null;
+        let quizCorrect = 0;
+        let quizLastType = 'char2romaji';
+
+        function setQuizScope(s, btn) {
+            document.querySelectorAll('#quizMenu .type-selector .type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            quizScope = s;
+        }
+
+        function buildQuizDeck() {
+            let cards = [];
+            if (quizScope === 'all') cards = [...HIRAGANA.map(c => ({ ...c, script: 'hira' })), ...KATAKANA.map(c => ({ ...c, script: 'kata' }))];
+            else if (quizScope === 'hiragana') cards = HIRAGANA.map(c => ({ ...c, script: 'hira' }));
+            else if (quizScope === 'katakana') cards = KATAKANA.map(c => ({ ...c, script: 'kata' }));
+            else if (quizScope === 'weak') {
+                const wh = HIRAGANA.filter(c => state.hardHira.includes(c.char)).map(c => ({ ...c, script: 'hira' }));
+                const wk = KATAKANA.filter(c => state.hardKata.includes(c.char)).map(c => ({ ...c, script: 'kata' }));
+                cards = [...wh, ...wk];
+                if (cards.length < 4) cards = [...HIRAGANA.slice(0, 20).map(c => ({ ...c, script: 'hira' }))];
+            }
+            return shuffle(cards);
+        }
+
+        function getWrongOptions(correct, type, all, count = 3) {
+            const pool = all.filter(c => c[type] !== correct[type]);
+            const shuffled = shuffle(pool);
+            return shuffled.slice(0, count).map(c => c[type]);
+        }
+
+        function startQuiz(type) {
+            quizLastType = type;
+            quizType = type;
+            quizDeck = buildQuizDeck();
+            quizIndex = 0;
+            quizScore = 0;
+            quizCombo = 0;
+            quizCorrect = 0;
+            document.getElementById('quizMenu').style.display = 'none';
+            document.getElementById('quizGame').style.display = '';
+            document.getElementById('quizResult').style.display = 'none';
+            if (type === 'speed') { quizTimer = 30; startQuizTimer(); }
+            renderQuizQ();
+        }
+
+        function startQuizTimer() {
+            clearInterval(quizTimerInterval);
+            quizTimerInterval = setInterval(() => {
+                quizTimer--;
+                document.getElementById('quizTimer').textContent = quizTimer;
+                if (quizTimer <= 0) { clearInterval(quizTimerInterval); endQuiz(); }
+            }, 1000);
+        }
+
+        function renderQuizQ() {
+            if (quizIndex >= quizDeck.length || (quizType !== 'speed' && quizIndex >= 10)) { endQuiz(); return; }
+            const c = quizDeck[quizIndex];
+            const allCards = quizScope === 'katakana' ? KATAKANA : (quizScope === 'hiragana' ? HIRAGANA : [...HIRAGANA, ...KATAKANA]);
+
+            document.getElementById('qNum').textContent = Math.min(quizIndex + 1, 10);
+            document.getElementById('qTotal').textContent = quizType === 'speed' ? '∞' : 10;
+            document.getElementById('quizScore').textContent = quizScore;
+            document.getElementById('quizCombo').textContent = quizCombo;
+
+            let qChar, qPrompt, options, correct;
+            if (quizType === 'char2romaji' || quizType === 'speed' || quizType === 'mixed') {
+                qChar = c.char;
+                qPrompt = 'เลือก romaji ที่ถูกต้อง';
+                correct = c.romaji;
+                const wrongs = getWrongOptions(c, 'romaji', allCards, 3);
+                options = shuffle([correct, ...wrongs]);
+            } else {
+                qChar = c.romaji;
+                qPrompt = 'เลือกตัวอักษรที่ถูกต้อง';
+                correct = c.char;
+                const wrongs = getWrongOptions(c, 'char', allCards, 3);
+                options = shuffle([correct, ...wrongs]);
+            }
+
+            document.getElementById('qChar').textContent = qChar;
+            document.getElementById('qChar').style.fontFamily = (quizType === 'romaji2char' || quizType === 'speed') ? 'inherit' : "'Noto Sans JP',sans-serif";
+            document.getElementById('qPrompt').textContent = qPrompt;
+
+            // ออกเสียงตัวอักษรญี่ปุ่นจริงๆ (เฉพาะ mode ที่แสดงตัวอักษร)
+            if (state.settings.audio && quizType !== 'romaji2char') {
+                setTimeout(() => speakJapanese(c.char), 200);
+            }
+
+            const optsEl = document.getElementById('quizOptions');
+            optsEl.innerHTML = options.map(opt => `
+    <div class="quiz-opt" onclick="answerQuiz('${opt.replace(/'/g, "\\'")}','${correct.replace(/'/g, "\\'")}',this)">
+      <span style="font-family:${quizType !== 'char2romaji' && quizType !== 'speed' && quizType !== 'mixed' ? "'Noto Sans JP',sans-serif" : 'inherit'}">${opt}</span>
+    </div>
+  `).join('');
+        }
+
+        function answerQuiz(answer, correct, btn) {
+            document.querySelectorAll('.quiz-opt').forEach(b => b.classList.add('disabled'));
+            const isCorrect = answer === correct;
+            btn.classList.add(isCorrect ? 'correct' : 'wrong');
+            if (!isCorrect) {
+                document.querySelectorAll('.quiz-opt').forEach(b => {
+                    if (b.textContent.trim() === correct) b.classList.add('correct');
+                });
+            }
+            if (isCorrect) {
+                quizCombo++;
+                quizCorrect++;
+                const baseScore = 10;
+                const comboBonus = Math.min(quizCombo * 2, 20);
+                quizScore += baseScore + comboBonus;
+                if (quizCombo >= 3) showComboAnim(quizCombo);
+                addXP(5);
+            } else {
+                quizCombo = 0;
+            }
+            document.getElementById('quizScore').textContent = quizScore;
+            document.getElementById('quizCombo').textContent = quizCombo;
+            setTimeout(() => { quizIndex++; renderQuizQ(); }, 800);
+        }
+
+        function endQuiz() {
+            clearInterval(quizTimerInterval);
+            document.getElementById('quizGame').style.display = 'none';
+            document.getElementById('quizResult').style.display = '';
+            document.getElementById('resultScore').textContent = quizScore + ' แต้ม';
+            const msgs = [
+                { min: 0, msg: 'ยังใหม่อยู่ ฝึกต่อไปนะคะ! 💪' },
+                { min: 50, msg: 'ดีมากเลยค่ะ! เริ่มจำได้แล้ว 🌟' },
+                { min: 100, msg: 'เก่งมากค่ะ! ทำได้ดีมาก! 🎉' },
+                { min: 200, msg: 'สุดยอดเลยค่ะ! ฮารุนะภูมิใจมาก! 🏆' },
+            ];
+            let msg = msgs[0].msg;
+            msgs.forEach(m => { if (quizScore >= m.min) msg = m.msg; });
+            document.getElementById('resultMsg').textContent = msg;
+            if (quizScore > state.quizBest) { state.quizBest = quizScore; saveState(); }
+            addXP(Math.floor(quizScore / 5));
+        }
+
+        function restartQuiz() {
+            startQuiz(quizLastType);
+        }
+
+        // =====================================================
+        // MEMORY GAME
+        // =====================================================
+        let memCards = [];
+        let memRevealed = [];
+        let memMatches = 0;
+        let memFlips = 0;
+        let memLock = false;
+        let memDifficulty = 'easy';
+
+        function startMemory(difficulty) {
+            memDifficulty = difficulty;
+            const counts = { easy: 6, medium: 10, hard: 15 };
+            const count = counts[difficulty];
+            document.getElementById('memoryMenu').style.display = 'none';
+            document.getElementById('memoryGame').style.display = '';
+
+            const allKana = shuffle([...HIRAGANA.slice(0, 30).map(c => ({ ...c, script: 'hira' })), ...KATAKANA.slice(0, 30).map(c => ({ ...c, script: 'kata' }))]);
+            const selected = allKana.slice(0, count);
+
+            const pairs = [];
+            selected.forEach(c => {
+                pairs.push({ id: c.char + '_kana', char: c.char, match: c.char + '_romaji', display: c.char, type: 'kana' });
+                pairs.push({ id: c.char + '_romaji', char: c.char, match: c.char + '_kana', display: c.romaji, type: 'romaji' });
+            });
+
+            memCards = shuffle(pairs);
+            memMatches = 0;
+            memFlips = 0;
+            memRevealed = [];
+            memLock = false;
+
+            document.getElementById('memTotal').textContent = count;
+            document.getElementById('memMatches').textContent = 0;
+            document.getElementById('memFlips').textContent = 0;
+
+            const cols = difficulty === 'hard' ? 6 : (difficulty === 'medium' ? 5 : 4);
+            const grid = document.getElementById('memGrid');
+            grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+            renderMemGrid();
+        }
+
+        function renderMemGrid() {
+            const grid = document.getElementById('memGrid');
+            grid.innerHTML = memCards.map((c, i) => `
+    <div class="memory-card" id="mc_${i}" onclick="flipMemCard(${i})">
+      <div class="memory-card-inner memory-card-front"></div>
+      <div class="memory-card-inner memory-card-back" style="font-family:${c.type === 'kana' ? "'Noto Sans JP',sans-serif" : 'inherit'};font-size:${c.type === 'kana' ? '1.4rem' : '0.9rem'}">${c.display}</div>
+    </div>
+  `).join('');
+        }
+
+        function flipMemCard(i) {
+            if (memLock) return;
+            const card = document.getElementById('mc_' + i);
+            if (!card || card.classList.contains('matched') || card.classList.contains('revealed')) return;
+            card.classList.add('revealed');
+            memFlips++;
+            document.getElementById('memFlips').textContent = memFlips;
+            memRevealed.push(i);
+            if (memRevealed.length === 2) {
+                memLock = true;
+                const [a, b] = memRevealed;
+                const cardA = memCards[a], cardB = memCards[b];
+                if (cardA.match === cardB.id || cardB.match === cardA.id) {
+                    setTimeout(() => {
+                        document.getElementById('mc_' + a).classList.add('matched');
+                        document.getElementById('mc_' + b).classList.add('matched');
+                        memMatches++;
+                        document.getElementById('memMatches').textContent = memMatches;
+                        memRevealed = [];
+                        memLock = false;
+                        addXP(15);
+                        if (memMatches === memCards.length / 2) {
+                            setTimeout(() => alert('🎉 เยี่ยมมาก! จับคู่ครบหมดแล้วค่ะ!'), 300);
+                        }
+                    }, 300);
+                } else {
+                    setTimeout(() => {
+                        document.getElementById('mc_' + a).classList.remove('revealed');
+                        document.getElementById('mc_' + b).classList.remove('revealed');
+                        memRevealed = [];
+                        memLock = false;
+                    }, 800);
+                }
+            }
+        }
+
+        // =====================================================
+        // CONVERSATION SYSTEM
+        // =====================================================
+        const conversations = {
+            greeting: {
+                intro: {
+                    bot: '🌸 สวัสดีค่ะ! ฉันชื่อฮารุนะ ยินดีที่ได้รู้จักค่ะ\nในภาษาญี่ปุ่น ทักทายว่า\n「こんにちは！(Konnichiwa)」\nลองทักทายฉันดูนะคะ！',
+                    choices: ['こんにちは！(สวัสดี)', 'おはようございます！(อรุณสวัสดิ์)', 'こんばんは！(ราตรีสวัสดิ์)']
+                },
+                'こんにちは！(สวัสดี)': {
+                    bot: 'こんにちは！🌸 ยอดเยี่ยมมากค่ะ!\nตอบกลับได้ว่า 「お元気ですか？(Ogenki desu ka?)」\nแปลว่า "เป็นยังไงบ้าง?"',
+                    choices: ['元気です！(สบายดีค่ะ)', 'まあまあです (พอทนได้)', 'あまり元気じゃないです (ไม่ค่อยดี)']
+                },
+                'おはようございます！(อรุณสวัสดิ์)': {
+                    bot: 'おはようございます！☀️ ดีมากค่ะ!\nตอบได้ว่า 「いい天気ですね (Ii tenki desu ne)」\nแปลว่า "อากาศดีนะ"',
+                    choices: ['そうですね！(ใช่เลยค่ะ)', 'でも暑いですね (แต่ร้อนนะ)']
+                },
+                'こんばんは！(ราตรีสวัสดิ์)': {
+                    bot: 'こんばんは！🌙 เก่งมากค่ะ!\nคืนนี้ตอบได้ว่า 「いい夜ですね (Ii yoru desu ne)」\nแปลว่า "คืนนี้ดีจังนะ"',
+                    choices: ['そうですね (ใช่เลย)', 'また明日！(เจอกันพรุ่งนี้)']
+                },
+                '元気です！(สบายดีค่ะ)': {
+                    bot: '元気そうですね！😊 ดีใจที่ได้ยินค่ะ!\nลองพูดต่อว่า 「あなたは？(Anata wa?)」\nแปลว่า "แล้วคุณล่ะ?"',
+                    choices: ['私も元気です (ฉันก็สบายดีค่ะ)', 'ありがとう！(ขอบคุณค่ะ)']
+                },
+            },
+            intro: {
+                intro: {
+                    bot: '🌸 มาฝึกแนะนำตัวภาษาญี่ปุ่นกันค่ะ!\nพูดว่า 「私の名前は〇〇です (Watashi no namae wa 〇〇 desu)」\nแปลว่า "ฉันชื่อ..." ลองเลือกดูนะคะ',
+                    choices: ['はじめまして！(ยินดีที่ได้รู้จัก)', '私の名前はタイです (ฉันชื่อไทย)', 'タイ人です (เป็นคนไทย)']
+                },
+                'はじめまして！(ยินดีที่ได้รู้จัก)': {
+                    bot: 'はじめまして！🎌 เยี่ยมเลยค่ะ!\nต่อด้วย 「どうぞよろしくお願いします (Douzo yoroshiku onegaishimasu)」\nแปลว่า "ขอฝากตัวด้วยนะคะ"',
+                    choices: ['どうぞよろしく！', 'こちらこそよろしく (ยินดีเหมือนกัน)']
+                },
+                'タイ人です (เป็นคนไทย)': {
+                    bot: 'タイ人ですか！🇹🇭 เจ๋งมากเลยค่ะ!\nพูดว่า 「タイから来ました (Tai kara kimashita)」\nแปลว่า "มาจากประเทศไทย"',
+                    choices: ['タイから来ました！', 'バンコクから来ました (มาจากกรุงเทพ)']
+                },
+            },
+            shopping: {
+                intro: {
+                    bot: '🛍️ มาฝึกซื้อของในภาษาญี่ปุ่นกันค่ะ!\nเข้าร้านแล้วพูกว่า 「これはいくらですか (Kore wa ikura desu ka?)」\nแปลว่า "อันนี้เท่าไหร่คะ?"',
+                    choices: ['これはいくらですか？', 'ちょっと見てもいいですか？(ขอดูได้ไหม)', 'すみません！(ขอโทษนะคะ)']
+                },
+                'これはいくらですか？': {
+                    bot: 'ร้านค้าตอบว่า:\n「300円です (Sanbyaku-en desu)」\nแปลว่า "300 เยนค่ะ"\nลองตอบค่ะ',
+                    choices: ['じゃあ、これをください (ขออันนี้เลยค่ะ)', 'もっと安いのはありますか？(มีถูกกว่าไหม)', 'ちょっと高いですね (แพงนิดหน่อยนะ)']
+                },
+                'じゃあ、これをください (ขออันนี้เลยค่ะ)': {
+                    bot: 'ร้านค้าพูดว่า:\n「ありがとうございます！(Arigatou gozaimasu!)」\nแปลว่า "ขอบคุณมากค่ะ"\nตอบว่า',
+                    choices: ['どうもありがとう！(ขอบคุณมากๆ)', 'またね！(เจอกันใหม่)', 'よい一日を (ขอให้วันดีนะคะ)']
+                },
+            },
+            food: {
+                intro: {
+                    bot: '🍜 มาสั่งอาหารภาษาญี่ปุ่นกันค่ะ!\nพนักงานถามว่า 「ご注文はお決まりですか？(Gochuumon wa okimari desu ka?)」\n"ตัดสินใจสั่งได้แล้วหรือยังคะ?"',
+                    choices: ['ラーメンをください (ขอราเมนค่ะ)', 'すしをふたつください (ขอซูชิสองค่ะ)', 'まだ決めていません (ยังไม่ตัดสินใจ)']
+                },
+                'ラーメンをください (ขอราเมนค่ะ)': {
+                    bot: 'พนักงาน:\n「かしこまりました！(Kashikomarimashita!)」\nแปลว่า "รับทราบค่ะ"\n\nอาหารมาแล้ว ลองพูดว่า',
+                    choices: ['いただきます！(ขอรับประทานค่ะ)', 'おいしそう！(น่ากินจัง)']
+                },
+                'いただきます！(ขอรับประทานค่ะ)': {
+                    bot: 'กินเสร็จแล้วพูดว่า:\n「ごちそうさまでした！(Gochisousama deshita!)」\nแปลว่า "ขอบคุณสำหรับอาหารค่ะ" 🙏\n\nเยี่ยมมากค่ะ!',
+                    choices: ['ごちそうさまでした！', 'おいしかったです (อร่อยมากค่ะ)']
+                },
+            },
+            direction: {
+                intro: {
+                    bot: '🗺️ มาฝึกถามทางภาษาญี่ปุ่นกันค่ะ!\nถามว่า 「〇〇はどこですか？(〇〇 wa doko desu ka?)」\nแปลว่า "〇〇 อยู่ที่ไหนคะ?"',
+                    choices: ['トイレはどこですか？(ห้องน้ำอยู่ที่ไหน)', 'えきはどこですか？(สถานีรถไฟอยู่ที่ไหน)', 'すみません、道を教えてください (ขอถามทางได้ไหม)']
+                },
+                'トイレはどこですか？(ห้องน้ำอยู่ที่ไหน)': {
+                    bot: 'คนตอบว่า:\n「あそこにあります (Asoko ni arimasu)」\nแปลว่า "อยู่ตรงโน้นค่ะ"\nตอบขอบคุณว่า',
+                    choices: ['ありがとうございます！(ขอบคุณมากค่ะ)', 'どうもありがとう！(ขอบคุณมากๆ)']
+                },
+                'えきはどこですか？(สถานีรถไฟอยู่ที่ไหน)': {
+                    bot: 'คนตอบว่า:\n「まっすぐ行ってください (Massugu itte kudasai)」\nแปลว่า "ตรงไปเลยค่ะ"\nตอบว่า',
+                    choices: ['わかりました！(เข้าใจแล้วค่ะ)', 'ありがとうございます！(ขอบคุณค่ะ)']
+                },
+            }
+        };
+
+        let currentScene = 'greeting';
+        let currentNode = 'intro';
+
+        function setConvScene(scene, btn) {
+            document.querySelectorAll('#page-conversation .type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentScene = scene;
+            currentNode = 'intro';
+            initConversation();
+        }
+
+        function initConversation() {
+            const chatArea = document.getElementById('chatArea');
+            const chatChoices = document.getElementById('chatChoices');
+            if (!chatArea) return;
+            chatArea.innerHTML = '';
+            currentNode = 'intro';
+            const node = conversations[currentScene]?.[currentNode];
+            if (node) {
+                addBotMsg(node.bot);
+                renderChoices(node.choices);
+            }
+        }
+
+        function addBotMsg(text) {
+            const chatArea = document.getElementById('chatArea');
+            const div = document.createElement('div');
+            div.className = 'chat-msg bot';
+            div.innerHTML = `<div class="chat-avatar">🌸</div><div class="chat-bubble">${text.replace(/\n/g, '<br>')}</div>`;
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function addUserMsg(text) {
+            const chatArea = document.getElementById('chatArea');
+            const div = document.createElement('div');
+            div.className = 'chat-msg user';
+            div.innerHTML = `<div class="chat-avatar">🙋</div><div class="chat-bubble">${text}</div>`;
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function renderChoices(choices) {
+            const chatChoices = document.getElementById('chatChoices');
+            chatChoices.innerHTML = choices.map(c => `
+    <button class="choice-btn" onclick="handleChoice('${c.replace(/'/g, "\\'")}')">${c}</button>
+  `).join('');
+        }
+
+        function handleChoice(choice) {
+            addUserMsg(choice);
+            addXP(8);
+            const choiceKey = choice;
+            const node = conversations[currentScene]?.[choiceKey];
+            document.getElementById('chatChoices').innerHTML = '';
+            setTimeout(() => {
+                if (node) {
+                    addBotMsg(node.bot);
+                    if (node.choices) renderChoices(node.choices);
+                    else {
+                        setTimeout(() => {
+                            addBotMsg('🌸 เยี่ยมมากค่ะ! ลองฝึกอีกรอบได้เลย!\nการฝึกพูดบ่อยๆ จะทำให้มั่นใจขึ้นมากค่ะ 💪');
+                            renderChoices(['เริ่มใหม่']);
+                        }, 1000);
+                    }
+                } else if (choice === 'เริ่มใหม่') {
+                    currentNode = 'intro';
+                    initConversation();
+                } else {
+                    addBotMsg('🌸 ดีมากค่ะ! ลองพูดต่อไปนะคะ 😊');
+                    const intro = conversations[currentScene]?.['intro'];
+                    if (intro) renderChoices(intro.choices);
+                }
+            }, 400);
+        }
+
+        // =====================================================
+        // ACHIEVEMENTS
+        // =====================================================
+        const ACHIEVEMENTS = [
+            { id: 'first_kana', icon: '🎌', name: 'ตัวแรก', desc: 'เรียนตัวอักษรแรก' },
+            { id: 'ten_kana', icon: '🔟', name: '10 ตัว', desc: 'จำตัวอักษรได้ 10 ตัว' },
+            { id: 'all_hira', icon: 'あ', name: 'ฮิรางานะ', desc: 'จำฮิรางานะครบ' },
+            { id: 'all_kata', icon: 'ア', name: 'คาตาคานะ', desc: 'จำคาตาคานะครบ' },
+            { id: 'quiz_100', icon: '⭐', name: '100 แต้ม', desc: 'ทำ Quiz ได้ 100 แต้ม' },
+            { id: 'level5', icon: '🏆', name: 'Level 5', desc: 'ขึ้นถึง Level 5' },
+            { id: 'streak7', icon: '🔥', name: '7 วัน', desc: 'เรียนต่อเนื่อง 7 วัน' },
+            { id: 'memory_pro', icon: '🧠', name: 'Memory Pro', desc: 'ชนะ Memory Game' },
+            { id: 'first_quiz', icon: '⚔️', name: 'นักสู้', desc: 'เล่น Quiz ครั้งแรก' },
+            { id: 'total_100', icon: '💯', name: '100 XP', desc: 'สะสม XP ได้ 100' },
+            { id: 'writer', icon: '✍️', name: 'นักเขียน', desc: 'ฝึกเขียน 10 ครั้ง' },
+            { id: 'speaker', icon: '🔊', name: 'นักพูด', desc: 'ฟังเสียง 20 ครั้ง' },
+            { id: 'combo5', icon: '🌟', name: 'Combo x5', desc: 'ตอบถูกต่อกัน 5 ครั้ง' },
+            { id: 'all_done', icon: '👑', name: 'ปรมาจารย์', desc: 'จำได้ทุกตัวอักษร' },
+            { id: 'level10', icon: '🏅', name: 'Level 10', desc: 'ขึ้นถึง Level 10' },
+        ];
+
+        function checkAchievements() {
+            const learned = state.learnedHira.length + state.learnedKata.length;
+            const unlock = (id) => {
+                if (!state.achievements[id]) { state.achievements[id] = true; saveState(); showAchievementToast(id); }
+            };
+            if (learned >= 1) unlock('first_kana');
+            if (learned >= 10) unlock('ten_kana');
+            if (state.learnedHira.length >= 46) unlock('all_hira');
+            if (state.learnedKata.length >= 46) unlock('all_kata');
+            if (state.quizBest >= 100) unlock('quiz_100');
+            if (state.level >= 5) unlock('level5');
+            if (state.level >= 10) unlock('level10');
+            if (state.streak >= 7) unlock('streak7');
+            if (state.xp + learned * 5 >= 100) unlock('total_100');
+            if (learned >= HIRAGANA.length + KATAKANA.length) unlock('all_done');
+        }
+
+        function showAchievementToast(id) {
+            const ach = ACHIEVEMENTS.find(a => a.id === id);
+            if (!ach) return;
+            const toast = document.createElement('div');
+            toast.style.cssText = `position:fixed;top:70px;right:16px;z-index:200;
+    background:linear-gradient(135deg,rgba(255,215,64,0.9),rgba(255,171,64,0.9));
+    color:#111;padding:10px 16px;border-radius:12px;font-size:0.85rem;
+    animation:xpPop 3s ease forwards;font-weight:700;`;
+            toast.textContent = ach.icon + ' ปลดล็อค: ' + ach.name;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function renderAchievements() {
+            ['allAchievements', 'homeAchievements'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const count = id === 'homeAchievements' ? 6 : ACHIEVEMENTS.length;
+                el.innerHTML = ACHIEVEMENTS.slice(0, count).map(a => `
+      <div class="achievement ${state.achievements[a.id] ? 'unlocked' : ''}">
+        <span class="ach-icon">${a.icon}</span>
+        <div class="ach-name">${a.name}</div>
+      </div>
+    `).join('');
+            });
+        }
+
+        // =====================================================
+        // DAILY MISSIONS
+        // =====================================================
+        const MISSIONS = [
+            { id: 'learn5', text: 'เรียนตัวอักษรใหม่ 5 ตัว', xp: 20 },
+            { id: 'quiz1', text: 'ทำ Quiz 1 ครั้ง', xp: 15 },
+            { id: 'flashcard10', text: 'ดู Flashcard 10 ใบ', xp: 10 },
+            { id: 'streak', text: 'รักษา Streak ต่อเนื่อง', xp: 25 },
+            { id: 'write5', text: 'ฝึกเขียน 5 ตัว', xp: 15 },
+        ];
+        function renderMissions() {
+            const el = document.getElementById('dailyMissions');
+            if (!el) return;
+            el.innerHTML = MISSIONS.map(m => `
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px">
+      <div>
+        <div style="font-size:0.85rem;font-weight:600">${m.text}</div>
+        <div style="font-size:0.75rem;color:var(--yellow)">+${m.xp} XP</div>
+      </div>
+      <div style="font-size:1.2rem">${state.achievements['mission_' + m.id] ? '✅' : '⬜'}</div>
+    </div>
+  `).join('');
+        }
+
+        // =====================================================
+        // UI HELPERS
+        // =====================================================
+        function showXPPopup(text) {
+            const el = document.createElement('div');
+            el.className = 'xp-popup';
+            el.textContent = text;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+        }
+
+        function showComboAnim(combo) {
+            const colors = ['#ffd740', '#ff6b9d', '#69f0ae', '#4fc3f7', '#ff5252'];
+            const el = document.createElement('div');
+            el.className = 'combo-anim';
+            el.textContent = `🔥 ${combo}x COMBO!`;
+            el.style.color = colors[Math.min(combo - 3, 4)];
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
+        function showLevelup(level) {
+            document.getElementById('newLevel').textContent = level;
+            document.getElementById('levelupOverlay').classList.add('active');
+        }
+        function closeLevelup() {
+            document.getElementById('levelupOverlay').classList.remove('active');
+        }
+
+        // =====================================================
+        // THEME
+        // =====================================================
+        let isLight = false;
+        function toggleTheme() {
+            isLight = !isLight;
+            document.body.classList.toggle('light-mode', isLight);
+            const btn = document.getElementById('lightToggle');
+            if (btn) btn.classList.toggle('on', isLight);
+            localStorage.setItem('lightMode', isLight);
+        }
+
+        function toggleSetting(key) {
+            state.settings[key] = !state.settings[key];
+            const toggleEl = document.getElementById(key + 'Toggle');
+            if (toggleEl) toggleEl.classList.toggle('on', state.settings[key]);
+            saveState();
+            if (key === 'particles') {
+                const pc = document.getElementById('particles');
+                if (pc) pc.style.display = state.settings.particles ? '' : 'none';
+            }
+        }
+
+        // =====================================================
+        // DAILY TIPS
+        // =====================================================
+        const TIPS = [
+            'เริ่มต้นจากสระก่อนนะคะ あ い う え お เพราะจะเป็นพื้นฐานของทุกแถว! 🌟',
+            'ฝึกเขียนทุกวัน แม้แค่ 5 นาทีก็ช่วยได้มากค่ะ! ✍️',
+            'ลองสร้างประโยคเชื่อมโยงกับชีวิตประจำวัน เช่น ねこ = แมว นึกถึงแมวตัวโปรดเลยค่ะ! 🐱',
+            'คาตาคานะใช้กับคำทับศัพท์ เช่น コーヒー (coffee) ลองอ่านป้ายร้านค้าญี่ปุ่นดูนะคะ ☕',
+            'Spaced Repetition คือเคล็ดลับ! ฝึกตัวที่ยากบ่อยๆ จะจำได้เร็วขึ้นค่ะ 🧠',
+            'ฟังเสียงควบคู่ไปกับการอ่านเสมอ ช่วยให้จำได้ทั้งรูปและเสียงค่ะ! 🔊',
+            'อย่าท้อนะคะ! ทุกคนเรียนรู้ในอัตราที่ต่างกัน ค่อยๆ ไปก็ได้ค่ะ 💪',
+            'ลองหาเพื่อนเรียนด้วยกัน จะสนุกและช่วยกระตุ้นได้มากขึ้นค่ะ! 👫',
+        ];
+
+        // =====================================================
+        // JP BG TEXT
+        // =====================================================
+        function initJPBg() {
+            const el = document.getElementById('jpBg');
+            const chars = HIRAGANA.concat(KATAKANA).map(c => c.char).join('');
+            el.textContent = chars.repeat(5);
+        }
+
+        // =====================================================
+        // RESET
+        // =====================================================
+        function resetProgress() {
+            if (confirm('ต้องการรีเซ็ตความก้าวหน้าทั้งหมดใช่ไหม? (ไม่สามารถเรียกคืนได้)')) {
+                localStorage.removeItem('harunaState');
+                location.reload();
+            }
+        }
+
+        // =====================================================
+        // INIT
+        // =====================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            initParticles();
+            initJPBg();
+            renderAchievements();
+            renderMissions();
+            updateUI();
+
+            // Set daily tip
+            const tip = TIPS[new Date().getDate() % TIPS.length];
+            const tipEl = document.getElementById('dailyTip');
+            if (tipEl) tipEl.textContent = tip;
+
+            // Init light mode
+            const savedLight = localStorage.getItem('lightMode');
+            if (savedLight === 'true') { isLight = true; document.body.classList.add('light-mode'); document.getElementById('lightToggle').classList.add('on'); }
+
+            // Init settings toggles
+            ['audio', 'romaji', 'particles', 'sr'].forEach(k => {
+                const el = document.getElementById(k + 'Toggle');
+                if (el) el.classList.toggle('on', state.settings[k]);
+            });
+
+            // Update progress
+            updateUI();
+
+            console.log('🌸 ฮารุนะ Japanese Learning App Loaded!');
+        });
+    </script>
+</body>
+
+</html>

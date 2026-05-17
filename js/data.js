@@ -108,6 +108,7 @@ const HIRAGANA = [
 // =====================================================
 // DATA: Complete Katakana Database
 // =====================================================
+
 const KATAKANA = [
   {char:'ア',romaji:'a',thai:'อา',type:'vowel',mnemonic:'ตัวア เหมือนตัว A ที่หมุนไป "อา" เหมือน A ยักษ์ 🔠',example:'アイス (aisu) = ไอศกรีม'},
   {char:'イ',romaji:'i',thai:'อิ',type:'vowel',mnemonic:'ตัวイ เหมือนเลข 1 ที่มีขีด "อิ" เส้นตรงๆ 1️⃣',example:'イタリア (itaria) = อิตาลี'},
@@ -207,7 +208,94 @@ const KATAKANA = [
 
 // =====================================================
 // STATE MANAGEMENT
+// =====================================================
 
+const ACHIEVEMENTS = [
+  {id:'first_kana',icon:'🎌',name:'ตัวแรก',desc:'เรียนตัวอักษรแรก'},
+  {id:'ten_kana',icon:'🔟',name:'10 ตัว',desc:'จำตัวอักษรได้ 10 ตัว'},
+  {id:'all_hira',icon:'あ',name:'ฮิรางานะ',desc:'จำฮิรางานะครบ'},
+  {id:'all_kata',icon:'ア',name:'คาตาคานะ',desc:'จำคาตาคานะครบ'},
+  {id:'quiz_100',icon:'⭐',name:'100 แต้ม',desc:'ทำ Quiz ได้ 100 แต้ม'},
+  {id:'level5',icon:'🏆',name:'Level 5',desc:'ขึ้นถึง Level 5'},
+  {id:'streak7',icon:'🔥',name:'7 วัน',desc:'เรียนต่อเนื่อง 7 วัน'},
+  {id:'memory_pro',icon:'🧠',name:'Memory Pro',desc:'ชนะ Memory Game'},
+  {id:'first_quiz',icon:'⚔️',name:'นักสู้',desc:'เล่น Quiz ครั้งแรก'},
+  {id:'total_100',icon:'💯',name:'100 XP',desc:'สะสม XP ได้ 100'},
+  {id:'writer',icon:'✍️',name:'นักเขียน',desc:'ฝึกเขียน 10 ครั้ง'},
+  {id:'speaker',icon:'🔊',name:'นักพูด',desc:'ฟังเสียง 20 ครั้ง'},
+  {id:'combo5',icon:'🌟',name:'Combo x5',desc:'ตอบถูกต่อกัน 5 ครั้ง'},
+  {id:'all_done',icon:'👑',name:'ปรมาจารย์',desc:'จำได้ทุกตัวอักษร'},
+  {id:'level10',icon:'🏅',name:'Level 10',desc:'ขึ้นถึง Level 10'},
+];
+
+
+const MISSIONS = [
+  {id:'learn5',text:'เรียนตัวอักษรใหม่ 5 ตัว',xp:20},
+  {id:'quiz1',text:'ทำ Quiz 1 ครั้ง',xp:15},
+  {id:'flashcard10',text:'ดู Flashcard 10 ใบ',xp:10},
+  {id:'streak',text:'รักษา Streak ต่อเนื่อง',xp:25},
+  {id:'write5',text:'ฝึกเขียน 5 ตัว',xp:15},
+];
+
+const TIPS = [
+  'เริ่มต้นจากสระก่อนนะคะ あ い う え お เพราะจะเป็นพื้นฐานของทุกแถว! 🌟',
+  'ฝึกเขียนทุกวัน แม้แค่ 5 นาทีก็ช่วยได้มากค่ะ! ✍️',
+  'ลองสร้างประโยคเชื่อมโยงกับชีวิตประจำวัน เช่น ねこ = แมว นึกถึงแมวตัวโปรดเลยค่ะ! 🐱',
+  'คาตาคานะใช้กับคำทับศัพท์ เช่น コーヒー (coffee) ลองอ่านป้ายร้านค้าญี่ปุ่นดูนะคะ ☕',
+  'Spaced Repetition คือเคล็ดลับ! ฝึกตัวที่ยากบ่อยๆ จะจำได้เร็วขึ้นค่ะ 🧠',
+  'ฟังเสียงควบคู่ไปกับการอ่านเสมอ ช่วยให้จำได้ทั้งรูปและเสียงค่ะ! 🔊',
+  'อย่าท้อนะคะ! ทุกคนเรียนรู้ในอัตราที่ต่างกัน ค่อยๆ ไปก็ได้ค่ะ 💪',
+  'ลองหาเพื่อนเรียนด้วยกัน จะสนุกและช่วยกระตุ้นได้มากขึ้นค่ะ! 👫',
+];
+
+// =====================================================
+// JP BG TEXT
+// =====================================================
+
+function buildSong(id, script, color, icon, title, desc, rows) {
+  // rows = [{char, romaji, thai, noteFreq, noteDur}]
+  // สร้าง steps จาก rows: highlight → note → speak → pause
+  const SPEAK_OFFSET = 80;   // ms หลัง highlight แล้วค่อยพูด
+  const NOTE_PRE     = 100;  // note เริ่มก่อน highlight เล็กน้อย
+  const GAP          = 200;  // หยุดระหว่างตัว
+
+  const steps = [];
+  const chars = [];
+  const lyrics = [];
+
+  // intro note ก่อน
+  steps.push({ type:'note', freq: rows[0].noteFreq * 0.75, dur: 300, delay: 0 });
+  steps.push({ type:'note', freq: rows[0].noteFreq * 0.85, dur: 200, delay: 300 });
+
+  let accDelay = 500;
+  rows.forEach((row, i) => {
+    chars.push({ char: row.char, romaji: row.romaji, thai: row.thai });
+    lyrics.push(`${row.char}  ${row.romaji}  →  ${row.thai}`);
+
+    // 1) เล่นโน้ต (เริ่มก่อน highlight นิดนึง)
+    steps.push({ type:'note', freq: row.noteFreq, dur: row.noteDur, delay: accDelay });
+    // 2) ไฮไลต์ตัวอักษร
+    steps.push({ type:'highlight', index: i, delay: accDelay + NOTE_PRE });
+    // 3) พูดตัวอักษร (หลัง highlight)
+    steps.push({ type:'speak', char: row.char, delay: accDelay + NOTE_PRE + SPEAK_OFFSET });
+    // 4) โน้ตสั้นๆ หลัง speak
+    steps.push({ type:'note', freq: row.noteFreq * 1.25, dur: Math.min(row.noteDur * 0.4, 180), delay: accDelay + NOTE_PRE + SPEAK_OFFSET + 350 });
+    // 5) lyric line
+    steps.push({ type:'lyric', index: i, delay: accDelay + NOTE_PRE });
+
+    accDelay += row.noteDur + GAP;
+  });
+
+  // outro
+  steps.push({ type:'note', freq: rows[0].noteFreq, dur: 400, delay: accDelay });
+  steps.push({ type:'note', freq: rows[0].noteFreq * 1.5, dur: 600, delay: accDelay + 420 });
+  steps.push({ type:'lyric', index: rows.length, delay: accDelay + 200 });
+  lyrics.push('จำได้แล้ว! 🎉');
+
+  const totalMs = accDelay + 1200;
+
+  return { id, script, color, icon, title, desc, chars, lyrics, steps, totalMs };
+}
 
 
 const SONGS = [
@@ -307,68 +395,7 @@ const SONGS = [
   ]),
 ];
 
-
-const ACHIEVEMENTS = [
-  {id:'first_kana',icon:'🎌',name:'ตัวแรก',desc:'เรียนตัวอักษรแรก'},
-  {id:'ten_kana',icon:'🔟',name:'10 ตัว',desc:'จำตัวอักษรได้ 10 ตัว'},
-  {id:'all_hira',icon:'あ',name:'ฮิรางานะ',desc:'จำฮิรางานะครบ'},
-  {id:'all_kata',icon:'ア',name:'คาตาคานะ',desc:'จำคาตาคานะครบ'},
-  {id:'quiz_100',icon:'⭐',name:'100 แต้ม',desc:'ทำ Quiz ได้ 100 แต้ม'},
-  {id:'level5',icon:'🏆',name:'Level 5',desc:'ขึ้นถึง Level 5'},
-  {id:'streak7',icon:'🔥',name:'7 วัน',desc:'เรียนต่อเนื่อง 7 วัน'},
-  {id:'memory_pro',icon:'🧠',name:'Memory Pro',desc:'ชนะ Memory Game'},
-  {id:'first_quiz',icon:'⚔️',name:'นักสู้',desc:'เล่น Quiz ครั้งแรก'},
-  {id:'total_100',icon:'💯',name:'100 XP',desc:'สะสม XP ได้ 100'},
-  {id:'writer',icon:'✍️',name:'นักเขียน',desc:'ฝึกเขียน 10 ครั้ง'},
-  {id:'speaker',icon:'🔊',name:'นักพูด',desc:'ฟังเสียง 20 ครั้ง'},
-  {id:'combo5',icon:'🌟',name:'Combo x5',desc:'ตอบถูกต่อกัน 5 ครั้ง'},
-  {id:'all_done',icon:'👑',name:'ปรมาจารย์',desc:'จำได้ทุกตัวอักษร'},
-  {id:'level10',icon:'🏅',name:'Level 10',desc:'ขึ้นถึง Level 10'},
-];
-
-
-
-
-// =====================================================
-// DAILY MISSIONS
-// =====================================================
-const MISSIONS = [
-  {id:'learn5',text:'เรียนตัวอักษรใหม่ 5 ตัว',xp:20},
-  {id:'quiz1',text:'ทำ Quiz 1 ครั้ง',xp:15},
-  {id:'flashcard10',text:'ดู Flashcard 10 ใบ',xp:10},
-  {id:'streak',text:'รักษา Streak ต่อเนื่อง',xp:25},
-  {id:'write5',text:'ฝึกเขียน 5 ตัว',xp:15},
-];
-
-// =====================================================
-// UI HELPERS
-// =====================================================
-
-
-
-// =====================================================
-// THEME
-// =====================================================
-let isLight = false;
-
-
-// =====================================================
-// DAILY TIPS
-// =====================================================
-const TIPS = [
-  'เริ่มต้นจากสระก่อนนะคะ あ い う え お เพราะจะเป็นพื้นฐานของทุกแถว! 🌟',
-  'ฝึกเขียนทุกวัน แม้แค่ 5 นาทีก็ช่วยได้มากค่ะ! ✍️',
-  'ลองสร้างประโยคเชื่อมโยงกับชีวิตประจำวัน เช่น ねこ = แมว นึกถึงแมวตัวโปรดเลยค่ะ! 🐱',
-  'คาตาคานะใช้กับคำทับศัพท์ เช่น コーヒー (coffee) ลองอ่านป้ายร้านค้าญี่ปุ่นดูนะคะ ☕',
-  'Spaced Repetition คือเคล็ดลับ! ฝึกตัวที่ยากบ่อยๆ จะจำได้เร็วขึ้นค่ะ 🧠',
-  'ฟังเสียงควบคู่ไปกับการอ่านเสมอ ช่วยให้จำได้ทั้งรูปและเสียงค่ะ! 🔊',
-  'อย่าท้อนะคะ! ทุกคนเรียนรู้ในอัตราที่ต่างกัน ค่อยๆ ไปก็ได้ค่ะ 💪',
-  'ลองหาเพื่อนเรียนด้วยกัน จะสนุกและช่วยกระตุ้นได้มากขึ้นค่ะ! 👫',
-];
-
-// =====================================================
-// JP BG TEXT
-// =====================================================
+// ===== SONG ENGINE — Single Timeline =====
 
 const CHARACTERS = [
   { id:'haruna',  name:'ฮารุนะ',          nameJP:'はるな',        emoji:'🌸', age:22, job:'นักศึกษา',         jobJP:'だいがくせい',    color:'#ff6b9d', bg:'linear-gradient(135deg,#ff6b9d,#b39ddb)', tag:'น่ารัก/ช่างพูด',      personality:'พูดเยอะ ใจดี ชอบใช้คำลงท้าย ね และ よ',                    origin:'โตเกียว',   hobby:'วาดภาพและดูอนิเมะ',        style:'friendly', tips:'ฮารุนะพูดเร็วและใช้ภาษาสแลงญี่ปุ่นบ้างค่ะ!' },

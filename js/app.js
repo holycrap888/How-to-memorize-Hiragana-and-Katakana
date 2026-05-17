@@ -1,4 +1,3 @@
-// =====================================================
 let state = {
   xp: 0, level: 1, streak: 0, lastDate: null,
   learnedHira: [], learnedKata: [],
@@ -735,6 +734,134 @@ function flipMemCard(i) {
 }
 
 // =====================================================
+// CONVERSATION SYSTEM
+// =====================================================
+
+function checkAchievements() {
+  const learned = state.learnedHira.length + state.learnedKata.length;
+  const unlock = (id) => {
+    if(!state.achievements[id]) { state.achievements[id]=true; saveState(); showAchievementToast(id); }
+  };
+  if(learned>=1) unlock('first_kana');
+  if(learned>=10) unlock('ten_kana');
+  if(state.learnedHira.length>=46) unlock('all_hira');
+  if(state.learnedKata.length>=46) unlock('all_kata');
+  if(state.quizBest>=100) unlock('quiz_100');
+  if(state.level>=5) unlock('level5');
+  if(state.level>=10) unlock('level10');
+  if(state.streak>=7) unlock('streak7');
+  if(state.xp+learned*5>=100) unlock('total_100');
+  if(learned>=HIRAGANA.length+KATAKANA.length) unlock('all_done');
+}
+
+function showAchievementToast(id) {
+  const ach = ACHIEVEMENTS.find(a=>a.id===id);
+  if(!ach) return;
+  const toast = document.createElement('div');
+  toast.style.cssText = `position:fixed;top:70px;right:16px;z-index:200;
+    background:linear-gradient(135deg,rgba(255,215,64,0.9),rgba(255,171,64,0.9));
+    color:#111;padding:10px 16px;border-radius:12px;font-size:0.85rem;
+    animation:xpPop 3s ease forwards;font-weight:700;`;
+  toast.textContent = ach.icon + ' ปลดล็อค: ' + ach.name;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),3000);
+}
+
+function renderAchievements() {
+  ['allAchievements','homeAchievements'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const count = id==='homeAchievements' ? 6 : ACHIEVEMENTS.length;
+    el.innerHTML = ACHIEVEMENTS.slice(0,count).map(a=>`
+      <div class="achievement ${state.achievements[a.id]?'unlocked':''}">
+        <span class="ach-icon">${a.icon}</span>
+        <div class="ach-name">${a.name}</div>
+      </div>
+    `).join('');
+  });
+}
+
+// =====================================================
+// DAILY MISSIONS
+// =====================================================
+
+function renderMissions() {
+  const el = document.getElementById('dailyMissions');
+  if(!el) return;
+  el.innerHTML = MISSIONS.map(m=>`
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px">
+      <div>
+        <div style="font-size:0.85rem;font-weight:600">${m.text}</div>
+        <div style="font-size:0.75rem;color:var(--yellow)">+${m.xp} XP</div>
+      </div>
+      <div style="font-size:1.2rem">${state.achievements['mission_'+m.id]?'✅':'⬜'}</div>
+    </div>
+  `).join('');
+}
+
+// =====================================================
+// UI HELPERS
+// =====================================================
+function showXPPopup(text) {
+  const el = document.createElement('div');
+  el.className = 'xp-popup';
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1500);
+}
+
+function showComboAnim(combo) {
+  const colors = ['#ffd740','#ff6b9d','#69f0ae','#4fc3f7','#ff5252'];
+  const el = document.createElement('div');
+  el.className = 'combo-anim';
+  el.textContent = `🔥 ${combo}x COMBO!`;
+  el.style.color = colors[Math.min(combo-3,4)];
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
+
+function showLevelup(level) {
+  document.getElementById('newLevel').textContent = level;
+  document.getElementById('levelupOverlay').classList.add('active');
+}
+function closeLevelup() {
+  document.getElementById('levelupOverlay').classList.remove('active');
+}
+
+// =====================================================
+// THEME
+// =====================================================
+let isLight = false;
+function toggleTheme() {
+  isLight = !isLight;
+  document.body.classList.toggle('light-mode', isLight);
+  const btn = document.getElementById('lightToggle');
+  if(btn) btn.classList.toggle('on', isLight);
+  localStorage.setItem('lightMode', isLight);
+}
+
+function toggleSetting(key) {
+  state.settings[key] = !state.settings[key];
+  const toggleEl = document.getElementById(key+'Toggle');
+  if(toggleEl) toggleEl.classList.toggle('on', state.settings[key]);
+  saveState();
+  if(key==='particles') {
+    const pc = document.getElementById('particles');
+    if(pc) pc.style.display = state.settings.particles ? '' : 'none';
+  }
+}
+
+// =====================================================
+// DAILY TIPS
+// =====================================================
+
+function initJPBg() {
+  const el = document.getElementById('jpBg');
+  const chars = HIRAGANA.concat(KATAKANA).map(c=>c.char).join('');
+  el.textContent = chars.repeat(5);
+}
+
+// =====================================================
 // 🎵 SONG MODE — ระบบเพลงช่วยจำ (Event-Timeline Architecture)
 // =====================================================
 
@@ -743,8 +870,6 @@ function flipMemCard(i) {
 // ทุกอย่างวิ่งบน timeline เดียว ไม่มีการ drift
 
 
-
-// ===== SONG ENGINE — Single Timeline =====
 let audioCtx = null;
 let currentSongId = null;
 let songTimeouts = [];
@@ -974,7 +1099,7 @@ function filterSongs(filter, btn) {
   renderSongs(filter);
 }
 
-// =====================================================
+
 function resetProgress() {
   if(confirm('ต้องการรีเซ็ตความก้าวหน้าทั้งหมดใช่ไหม? (ไม่สามารถเรียกคืนได้)')) {
     localStorage.removeItem('harunaState');
@@ -1013,12 +1138,10 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
   console.log('🌸 ฮารุนะ Japanese Learning App Loaded!');
 });
-// =====================================================
-// 💬 CONVERSATION SYSTEM v2 — Random Characters
-// =====================================================
 
-let currentScene = 'greeting';
+// ===== STATE =====
 let currentChar = null;
+let currentScene = 'greeting';
 
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -1148,100 +1271,3 @@ function addUserMsg(text) {
 
 function renderChoices(choices) { renderConvChoices(choices); }
 function handleChoice(choice) { handleConvChoice(choice); }
-
-function checkAchievements() {
-  const learned = state.learnedHira.length + state.learnedKata.length;
-  const unlock = (id) => {
-    if(!state.achievements[id]) { state.achievements[id]=true; saveState(); showAchievementToast(id); }
-  };
-  if(learned>=1) unlock('first_kana');
-  if(learned>=10) unlock('ten_kana');
-  if(state.learnedHira.length>=46) unlock('all_hira');
-  if(state.learnedKata.length>=46) unlock('all_kata');
-  if(state.quizBest>=100) unlock('quiz_100');
-  if(state.level>=5) unlock('level5');
-  if(state.level>=10) unlock('level10');
-  if(state.streak>=7) unlock('streak7');
-  if(state.xp+learned*5>=100) unlock('total_100');
-  if(learned>=HIRAGANA.length+KATAKANA.length) unlock('all_done');
-}
-
-function showAchievementToast(id) {
-  const ach = ACHIEVEMENTS.find(a=>a.id===id);
-  if(!ach) return;
-  const toast = document.createElement('div');
-  toast.style.cssText = `position:fixed;top:70px;right:16px;z-index:200;
-    background:linear-gradient(135deg,rgba(255,215,64,0.9),rgba(255,171,64,0.9));
-    color:#111;padding:10px 16px;border-radius:12px;font-size:0.85rem;
-    animation:xpPop 3s ease forwards;font-weight:700;`;
-  toast.textContent = ach.icon + ' ปลดล็อค: ' + ach.name;
-  document.body.appendChild(toast);
-  setTimeout(()=>toast.remove(),3000);
-}
-
-function renderAchievements() {
-  ['allAchievements','homeAchievements'].forEach(id => {
-    const el = document.getElementById(id);
-    if(!el) return;
-    const count = id==='homeAchievements' ? 6 : ACHIEVEMENTS.length;
-    el.innerHTML = ACHIEVEMENTS.slice(0,count).map(a=>`
-      <div class="achievement ${state.achievements[a.id]?'unlocked':''}">
-        <span class="ach-icon">${a.icon}</span>
-        <div class="ach-name">${a.name}</div>
-      </div>
-    `).join('');
-  });
-}
-
-// =====================================================
-// DAILY MISSIONS
-// =====================================================
-const MISSIONS = [
-  {id:'learn5',text:'เรียนตัวอักษรใหม่ 5 ตัว',xp:20},
-  {id:'quiz1',text:'ทำ Quiz 1 ครั้ง',xp:15},
-  {id:'flashcard10',text:'ดู Flashcard 10 ใบ',xp:10},
-  {id:'streak',text:'รักษา Streak ต่อเนื่อง',xp:25},
-  {id:'write5',text:'ฝึกเขียน 5 ตัว',xp:15},
-];
-function renderMissions() {
-  const el = document.getElementById('dailyMissions');
-  if(!el) return;
-  el.innerHTML = MISSIONS.map(m=>`
-    <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px">
-      <div>
-        <div style="font-size:0.85rem;font-weight:600">${m.text}</div>
-        <div style="font-size:0.75rem;color:var(--yellow)">+${m.xp} XP</div>
-      </div>
-      <div style="font-size:1.2rem">${state.achievements['mission_'+m.id]?'✅':'⬜'}</div>
-    </div>
-  `).join('');
-}
-
-// =====================================================
-// UI HELPERS
-// =====================================================
-function showXPPopup(text) {
-  const el = document.createElement('div');
-  el.className = 'xp-popup';
-  el.textContent = text;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),1500);
-}
-
-function showComboAnim(combo) {
-  const colors = ['#ffd740','#ff6b9d','#69f0ae','#4fc3f7','#ff5252'];
-  const el = document.createElement('div');
-  el.className = 'combo-anim';
-  el.textContent = `🔥 ${combo}x COMBO!`;
-  el.style.color = colors[Math.min(combo-3,4)];
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),1000);
-}
-
-function showLevelup(level) {
-  document.getElementById('newLevel').textContent = level;
-  document.getElementById('levelupOverlay').classList.add('active');
-}
-function closeLevelup() {
-  document.getElementById('levelupOverlay').classList.remove('active');
-}
