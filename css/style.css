@@ -496,7 +496,29 @@ canvas#drawCanvas{
 .streak-badge .fire{animation:flicker 0.5s ease infinite alternate}
 @keyframes flicker{from{transform:scale(1)}to{transform:scale(1.2)rotate(5deg)}}
 
-/* ===== SETTINGS ===== */
+/* ===== CONVERSATION INPUT ===== */
+.conv-choices-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.conv-input-wrap{
+  display:flex;gap:8px;align-items:center;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:8px 12px;
+  transition:var(--transition);
+}
+.conv-input-wrap:focus-within{border-color:var(--pink);box-shadow:var(--glow-pink)}
+.conv-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:inherit;font-size:0.9rem;
+  padding:4px 0;min-width:0;
+}
+.conv-input::placeholder{color:var(--text2);font-size:0.85rem}
+.conv-send-btn{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  border:none;border-radius:8px;padding:7px 14px;
+  color:white;font-family:inherit;font-size:0.85rem;font-weight:700;
+  cursor:pointer;transition:var(--transition);white-space:nowrap;flex-shrink:0;
+}
+.conv-send-btn:hover{box-shadow:var(--glow-pink);transform:translateY(-1px)}
+.conv-send-btn:active{transform:scale(0.96)}
 .setting-row{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 0;border-bottom:1px solid var(--border);

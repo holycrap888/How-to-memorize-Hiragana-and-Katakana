@@ -1205,9 +1205,129 @@ function initConversation() {
 function renderConvChoices(choices) {
   const chatChoices = document.getElementById('chatChoices');
   if(!chatChoices) return;
-  chatChoices.innerHTML = choices.map(c => `
-    <button class="choice-btn" onclick="handleConvChoice('${c.replace(/'/g,"\\'")}')">${c}</button>
-  `).join('');
+  chatChoices.innerHTML = `
+    <div class="conv-choices-wrap">
+      ${choices.map(c => `
+        <button class="choice-btn" onclick="handleConvChoice('${c.replace(/'/g,"\\'")}')">${c}</button>
+      `).join('')}
+    </div>
+    <div class="conv-input-wrap">
+      <input class="conv-input" id="convInput" type="text"
+        placeholder="พิมพ์ภาษาญี่ปุ่นหรือไทยได้เลยค่ะ..."
+        onkeydown="if(event.key==='Enter') sendConvInput()"
+        autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <button class="conv-send-btn" onclick="sendConvInput()">ส่ง ▶</button>
+    </div>
+  `;
+  // focus input on desktop
+  const inp = document.getElementById('convInput');
+  if(inp && window.innerWidth > 600) inp.focus();
+}
+
+// ฟังก์ชัน fuzzy match — หาว่า input ของผู้ใช้ตรงกับ choice ไหนมากที่สุด
+function matchChoice(input, choices) {
+  if(!input) return null;
+  const normalize = s => s.toLowerCase().replace(/[^\u0000-\u007F\u0E00-\u0E7F\u3000-\u9FFF]/g,'').trim();
+  const inp = normalize(input);
+
+  // 1) ตรงเป๊ะ
+  for(const c of choices) if(normalize(c) === inp) return c;
+
+  // 2) choice มีส่วนที่ input พิมพ์มา (หรือกลับกัน)
+  for(const c of choices) {
+    const nc = normalize(c);
+    if(nc.includes(inp) || inp.includes(nc)) return c;
+  }
+
+  // 3) แยกคำแล้วนับ overlap
+  const inpWords = inp.split(/\s+/);
+  let bestScore = 0, bestChoice = null;
+  for(const c of choices) {
+    const nc = normalize(c);
+    let score = 0;
+    for(const w of inpWords) if(w.length > 1 && nc.includes(w)) score++;
+    // ดึงแค่ตัวอักษรญี่ปุ่นจาก choice มา match
+    const jpPart = c.match(/[\u3040-\u30FF\u4E00-\u9FFF]+/g)?.join('') || '';
+    const jpInp  = input.match(/[\u3040-\u30FF\u4E00-\u9FFF]+/g)?.join('') || '';
+    if(jpPart && jpInp && jpPart.includes(jpInp)) score += 3;
+    if(score > bestScore) { bestScore = score; bestChoice = c; }
+  }
+  if(bestScore > 0) return bestChoice;
+
+  return null; // ไม่เจอ — ตอบแบบ freestyle
+}
+
+// freestyle reply เมื่อพิมพ์อะไรที่ไม่ match choice ไหน
+function freestyleReply(input) {
+  const scene = SCENES[currentScene];
+  if(!scene || !currentChar) return;
+
+  // ตรวจหาคำญี่ปุ่นใน input แล้วชม
+  const hasJP = /[\u3040-\u30FF\u4E00-\u9FFF]/.test(input);
+
+  const praises = {
+    friendly: ['わあ！上手ですね！🌸 ','すごい！日本語が話せるんですね！','えらい！ちゃんと伝わりましたよ！'],
+    formal:   ['なるほど、おっしゃる通りです。','ありがとうございます。よく分かりました。'],
+    shy:      ['あ...そうなんですか... (うれしい) 😊','え...上手ですね...びっくりしました...'],
+    energetic:['すごーい！！🎉 日本語上手じゃん！！','わあ！！言えた！！やばくない！？'],
+    cool:     ['ふーん。まあまあだな。','悪くない。'],
+    old:      ['ほほう、なかなかやりますね。えらいえらい。','日本語が話せるとは。感心しました。'],
+    young:    ['え！マジ！？上手じゃん！！','日本語しゃべれんの！やばっ！'],
+    blunt:    ['まあ、悪くない。','そうか。'],
+  };
+
+  const questions = {
+    friendly: ['他に聞きたいことはありますか？😊','もっと話しましょうか？'],
+    formal:   ['他にご質問はございますか？','何かお手伝いできることはありますか？'],
+    shy:      ['え...他に...何かありますか...？','もう少し...話しますか...？'],
+    energetic:['もっと話して！！何でも聞いて！！','他に何か知りたいことある！？'],
+    cool:     ['他は？','何か？'],
+    old:      ['他に聞きたいことはありますか？','もっとゆっくり話しましょうか？'],
+    young:    ['他にある！？','何でも聞いて！'],
+    blunt:    ['他は？','以上？'],
+  };
+
+  const style = currentChar.style || 'friendly';
+  const praise  = rand(praises[style]  || praises.friendly);
+  const question = rand(questions[style] || questions.friendly);
+
+  const jpNote = hasJP
+    ? praise + `「${input}」` + ' — ' + question
+    : '🌸 ลองพิมพ์เป็นภาษาญี่ปุ่นด้วยได้เลยนะคะ!\n' + question;
+
+  setTimeout(() => {
+    addBotMsg(jpNote, currentChar);
+    setTimeout(() => {
+      const scene2 = SCENES[currentScene];
+      renderConvChoices([...scene2.choices.slice(0,2), '🎲 คุยต่อ (ตัวเลือกใหม่)', '🔄 เริ่มใหม่กับตัวละครนี้', '🎭 สุ่มตัวละครใหม่']);
+    }, 700);
+  }, 500);
+}
+
+function sendConvInput() {
+  const inp = document.getElementById('convInput');
+  if(!inp) return;
+  const val = inp.value.trim();
+  if(!val) return;
+  inp.value = '';
+
+  // Special commands
+  if(val === '🔄' || val === 'เริ่มใหม่') { initConversation(); return; }
+  if(val === '🎭' || val === 'สุ่มใหม่')  { rollNewChar(); return; }
+
+  const scene = SCENES[currentScene];
+  const allChoices = scene ? [...(scene.choices || [])] : [];
+
+  const matched = matchChoice(val, allChoices);
+  if(matched) {
+    handleConvChoice(matched);
+  } else {
+    addUserMsg(val);
+    const chatChoices = document.getElementById('chatChoices');
+    if(chatChoices) chatChoices.innerHTML = '';
+    addXP(5);
+    freestyleReply(val);
+  }
 }
 
 function handleConvChoice(choice) {
