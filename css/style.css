@@ -390,112 +390,27 @@ canvas#drawCanvas{
 .modal h2{font-family:'Fredoka One',cursive;font-size:1.5rem;margin-bottom:8px}
 .modal p{color:var(--text2);margin-bottom:16px;line-height:1.6}
 
-/* ===== SONG MODE ===== */
-.song-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--radius);padding:16px;margin-bottom:12px;
-  cursor:pointer;transition:var(--transition);position:relative;overflow:hidden;
-}
-.song-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,107,157,0.2)}
-.song-card.playing{border-color:var(--pink);background:rgba(255,107,157,0.08)}
-.song-card-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.song-icon{
-  width:52px;height:52px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:1.5rem;
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-}
-.song-card.playing .song-icon{animation:spinSlow 3s linear infinite}
-@keyframes spinSlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.song-title{font-size:1rem;font-weight:700}
-.song-desc{font-size:0.78rem;color:var(--text2);margin-top:2px}
-.song-chars{
-  display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;
-  font-family:'Noto Sans JP',sans-serif;
-}
-.song-char-pill{
-  background:rgba(255,255,255,0.07);border:1px solid var(--border);
-  border-radius:20px;padding:4px 10px;font-size:0.85rem;
-  transition:var(--transition);display:flex;align-items:center;gap:4px;
-}
-.song-char-pill.active{
-  background:linear-gradient(135deg,rgba(255,107,157,0.3),rgba(179,157,219,0.3));
-  border-color:var(--pink);transform:scale(1.1);
-}
-.song-char-pill .pill-romaji{font-size:0.65rem;color:var(--text2);font-family:inherit}
-.song-play-btn{
-  width:100%;padding:10px;border:none;border-radius:var(--radius-sm);
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-  color:white;font-family:inherit;font-size:0.9rem;font-weight:700;
-  cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.song-play-btn:hover{box-shadow:var(--glow-pink);transform:translateY(-1px)}
-.song-play-btn.stop{background:linear-gradient(135deg,var(--red),var(--orange))}
-.song-lyrics{
-  background:rgba(255,255,255,0.04);border-radius:var(--radius-sm);
-  padding:12px;margin-top:10px;font-size:0.85rem;line-height:2;
-  border-left:3px solid var(--pink);display:none;
-}
-.song-card.playing .song-lyrics{display:block}
-.lyric-line{transition:var(--transition);color:var(--text2)}
-.lyric-line.active{color:var(--pink);font-weight:700;font-size:0.95rem}
-.beat-bar{
-  height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:8px;overflow:hidden;
-}
-.beat-fill{
-  height:100%;width:0%;background:linear-gradient(90deg,var(--pink),var(--purple));
-  border-radius:2px;transition:width 0.1s linear;
-}
-.visualizer{
-  display:flex;align-items:flex-end;gap:3px;height:30px;margin:8px 0;
-}
-.vis-bar{
-  flex:1;background:linear-gradient(to top,var(--pink),var(--purple));
-  border-radius:2px 2px 0 0;min-height:4px;
-  transition:height 0.1s ease;
-}
-.song-mode-badge{
-  position:absolute;top:10px;right:10px;
-  background:linear-gradient(135deg,var(--yellow),var(--orange));
-  color:#111;font-size:0.65rem;font-weight:700;
-  padding:3px 8px;border-radius:10px;
-}
-/* ===== LEVEL UP ===== */
-.levelup-overlay{
-  position:fixed;inset:0;z-index:300;
-  background:rgba(0,0,0,0.85);
-  display:none;align-items:center;justify-content:center;
-  flex-direction:column;gap:16px;
-}
-.levelup-overlay.active{display:flex;animation:levelUp 0.5s ease}
-@keyframes levelUp{from{opacity:0}to{opacity:1}}
-.levelup-text{
-  font-family:'Fredoka One',cursive;font-size:3rem;
-  background:linear-gradient(135deg,var(--yellow),var(--orange),var(--pink));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:pulse 0.5s ease infinite alternate;
-}
-@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.05)}}
-
-/* ===== XP POPUP ===== */
-.xp-popup{
-  position:fixed;bottom:120px;right:20px;z-index:150;
-  background:linear-gradient(135deg,var(--yellow),var(--orange));
-  color:#111;padding:8px 16px;border-radius:20px;
-  font-weight:700;font-size:0.9rem;
-  animation:xpPop 1.5s ease forwards;pointer-events:none;
-}
-@keyframes xpPop{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-60px);opacity:0}}
-
-/* ===== STREAK ===== */
-.streak-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:linear-gradient(135deg,rgba(255,171,64,0.2),rgba(255,82,82,0.2));
-  border:1px solid rgba(255,171,64,0.4);border-radius:20px;
-  padding:4px 12px;font-size:0.85rem;
-}
-.streak-badge .fire{animation:flicker 0.5s ease infinite alternate}
-@keyframes flicker{from{transform:scale(1)}to{transform:scale(1.2)rotate(5deg)}}
-
+/* ===== KANA RUNNER ===== */
+.runner-hud{display:flex;gap:8px;justify-content:space-between;margin-bottom:10px}
+.runner-stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;flex:1;min-width:0}
+.runner-stat span{display:block;font-size:1.2rem;font-weight:700;font-family:'Fredoka One',cursive;color:var(--pink)}
+.runner-stat small{font-size:0.62rem;color:var(--text2)}
+.runner-canvas-wrap{position:relative;width:100%;border-radius:var(--radius);overflow:hidden;border:2px solid var(--border);background:#0a0a1a;margin-bottom:10px}
+canvas#runnerCanvas{display:block;width:100%;height:auto}
+.runner-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.78);backdrop-filter:blur(8px);flex-direction:column;gap:10px;text-align:center;padding:20px}
+.runner-options{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.runner-opt{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);padding:12px 8px;text-align:center;cursor:pointer;transition:var(--transition);position:relative;overflow:hidden}
+.runner-opt:hover{border-color:var(--pink);background:rgba(255,107,157,0.1);transform:scale(1.03)}
+.runner-opt.correct{border-color:var(--green)!important;background:rgba(105,240,174,0.2)!important;animation:correctPop 0.3s ease}
+.runner-opt.wrong{border-color:var(--red)!important;background:rgba(255,82,82,0.2)!important;animation:wrongShake 0.3s ease}
+.opt-timer{position:absolute;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width linear}
+@keyframes correctPop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.runner-lb-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px}
+.lb-rank{font-size:1.2rem;min-width:32px}
+.lb-info{flex:1;margin-left:8px}
+.lb-mode{font-size:0.72rem;color:var(--text2)}
+.lb-score{font-size:1.1rem;font-weight:700;font-family:'Fredoka One',cursive;color:var(--yellow)}
 /* ===== CONVERSATION INPUT ===== */
 .conv-choices-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .conv-input-wrap{

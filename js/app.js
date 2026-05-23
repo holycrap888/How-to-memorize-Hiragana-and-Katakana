@@ -85,7 +85,7 @@ function showPage(name) {
   if(name==='writing') initWriting();
   if(name==='memory') { document.getElementById('memoryMenu').style.display=''; document.getElementById('memoryGame').style.display='none'; }
   if(name==='quiz') { document.getElementById('quizMenu').style.display=''; document.getElementById('quizGame').style.display='none'; document.getElementById('quizResult').style.display='none'; }
-  if(name==='song') { renderSongs('all'); stopAllSongs(); }
+  if(name==='runner') { initRunnerPage(); }
   if(name==='conversation') initConversation();
   if(name==='progress') { renderAchievements(); renderMissions(); updateUI(); }
   window.scrollTo(0,0);
@@ -865,241 +865,423 @@ function initJPBg() {
 // 🎵 SONG MODE — ระบบเพลงช่วยจำ (Event-Timeline Architecture)
 // =====================================================
 
-// แต่ละ song มี `steps` — array ของ events ที่เกิดตามลำดับเวลา
-// step: { type: 'note'|'speak'|'highlight'|'lyric', ... , delay: ms จาก step ก่อน }
-// ทุกอย่างวิ่งบน timeline เดียว ไม่มีการ drift
 
 
-let audioCtx = null;
-let currentSongId = null;
-let songTimeouts = [];
-let songIsPlaying = false;
-let beatInterval = null;
-let speechQueue = [];
-let speechBusy = false;
 
-function getAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  return audioCtx;
+// =====================================================
+// 🏃 KANA RUNNER GAME ENGINE
+// =====================================================
+
+const RUNNER_MODES = {
+  'hiragana-easy': { label:'ฮิรางานะ ง่าย', icon:'🌱', speed:2.2, spawnMs:3200, data:()=>HIRAGANA.filter(c=>['vowel','k','s'].includes(c.type)) },
+  'hiragana-hard': { label:'ฮิรางานะ ยาก',  icon:'🔥', speed:3.8, spawnMs:2200, data:()=>HIRAGANA },
+  'katakana-easy': { label:'คาตาคานะ ง่าย',icon:'❄️', speed:2.2, spawnMs:3200, data:()=>KATAKANA.filter(c=>['vowel','k','s'].includes(c.type)) },
+  'katakana-hard': { label:'คาตาคานะ ยาก', icon:'⚡', speed:3.8, spawnMs:2200, data:()=>KATAKANA },
+  'mixed-hard':    { label:'Mixed ยาก',      icon:'🌀', speed:4.2, spawnMs:1900, data:()=>[...HIRAGANA,...KATAKANA] },
+};
+
+let RN = {
+  running:false, score:0, combo:0, hp:3,
+  mode:'hiragana-easy', kanaPool:[], currentKana:null,
+  obstacles:[], player:{x:0,y:0,vy:0,jumping:false,frame:0},
+  ground:0, canvas:null, ctx:null, raf:null,
+  spawnTimer:null, optionTimer:null, answerLocked:false,
+  speed:2.2, frameCount:0, bgX:0, cloudX:0,
+  scorePopups:[], canvasShake:0,
+};
+
+function initRunnerPage(){
+  const menu = document.getElementById('runnerMenu');
+  const game = document.getElementById('runnerGame');
+  if(menu) menu.style.display='';
+  if(game) game.style.display='none';
+  renderRunnerLeaderboard();
 }
 
-function playNote(freq, dur, time, vol = 0.25) {
-  if (!freq || freq <= 0) return;
-  try {
-    const ctx = getAudioCtx();
-    // melody
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(vol, time + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + dur / 1000 - 0.01);
-    osc.start(time); osc.stop(time + dur / 1000);
-    // harmony (octave up, softer)
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.connect(gain2); gain2.connect(ctx.destination);
-    osc2.type = 'triangle';
-    osc2.frequency.value = freq * 2;
-    gain2.gain.setValueAtTime(0, time);
-    gain2.gain.linearRampToValueAtTime(vol * 0.18, time + 0.01);
-    gain2.gain.exponentialRampToValueAtTime(0.001, time + dur / 1000 - 0.01);
-    osc2.start(time); osc2.stop(time + dur / 1000);
-  } catch(e) {}
+// ── Leaderboard ──
+function getRunnerScores(){
+  try{ return JSON.parse(localStorage.getItem('runnerScores')||'[]'); }catch{ return []; }
+}
+function saveRunnerScore(mode, score){
+  const all = getRunnerScores();
+  all.push({mode, score, date:new Date().toLocaleDateString('th-TH')});
+  all.sort((a,b)=>b.score-a.score);
+  localStorage.setItem('runnerScores', JSON.stringify(all.slice(0,10)));
+}
+function renderRunnerLeaderboard(){
+  const el = document.getElementById('runnerLeaderboard');
+  if(!el) return;
+  const scores = getRunnerScores();
+  if(!scores.length){
+    el.innerHTML=`<div style="text-align:center;color:var(--text2);padding:16px;font-size:0.85rem">ยังไม่มีคะแนนค่ะ — เริ่มเล่นได้เลย! 🏃</div>`;
+    return;
+  }
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML=scores.map((s,i)=>`
+    <div class="runner-lb-row">
+      <div class="lb-rank">${medals[i]||'#'+(i+1)}</div>
+      <div class="lb-info">
+        <div style="font-size:0.85rem;font-weight:600">${RUNNER_MODES[s.mode]?.icon||''} ${RUNNER_MODES[s.mode]?.label||s.mode}</div>
+        <div class="lb-mode">${s.date}</div>
+      </div>
+      <div class="lb-score">${s.score}</div>
+    </div>`).join('');
 }
 
-// Sequential speech queue — พูดทีละตัว รอให้จบแล้วค่อยพูดตัวต่อไป
-function enqueueSpeech(char, atMs) {
-  speechQueue.push({ char, atMs });
+// ── Start / Stop ──
+function startRunner(kanaType, difficulty){
+  const modeKey  = kanaType+'-'+difficulty;
+  const modeConf = RUNNER_MODES[modeKey];
+  if(!modeConf) return;
+
+  document.getElementById('runnerMenu').style.display='none';
+  document.getElementById('runnerGame').style.display='';
+
+  Object.assign(RN,{
+    running:true, score:0, combo:0, hp:3,
+    mode:modeKey, speed:modeConf.speed,
+    obstacles:[], scorePopups:[],
+    frameCount:0, bgX:0, cloudX:0,
+    answerLocked:false, currentKana:null, canvasShake:0,
+    kanaPool: shuffle([...modeConf.data()]),
+  });
+
+  RN.canvas = document.getElementById('runnerCanvas');
+  RN.ctx    = RN.canvas.getContext('2d');
+  const wrap = RN.canvas.parentElement;
+  RN.canvas.width  = Math.min(wrap.clientWidth, 600);
+  RN.canvas.height = Math.round(RN.canvas.width * 0.42);
+  RN.ground = RN.canvas.height * 0.72;
+  RN.player = { x:RN.canvas.width*0.18, y:RN.ground, vy:0, jumping:false, frame:0 };
+
+  updateRunnerHUD();
+  hideRunnerOverlay();
+  scheduleNextObstacle(modeConf.spawnMs);
+  runnerLoop();
 }
 
-function processSpeechQueue(startWallMs) {
-  if (!songIsPlaying || speechQueue.length === 0) return;
-  const now = Date.now();
-  const item = speechQueue[0];
-  const fireAt = startWallMs + item.atMs;
-  const wait = Math.max(0, fireAt - now);
-
-  const t = setTimeout(() => {
-    if (!songIsPlaying) return;
-    speechQueue.shift();
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(item.char);
-    u.lang = 'ja-JP';
-    u.rate = 0.8;
-    u.pitch = 1.0;
-    u.volume = 1.0;
-    const v = getJapaneseVoice();
-    if (v) u.voice = v;
-    u.onend = () => { if (songIsPlaying) processSpeechQueue(startWallMs); };
-    u.onerror = () => { if (songIsPlaying) processSpeechQueue(startWallMs); };
-    window.speechSynthesis.speak(u);
-  }, wait);
-  songTimeouts.push(t);
+function stopRunner(){
+  RN.running=false;
+  if(RN.raf) cancelAnimationFrame(RN.raf);
+  if(RN.spawnTimer) clearTimeout(RN.spawnTimer);
+  if(RN.optionTimer) clearTimeout(RN.optionTimer);
+  document.getElementById('runnerGame').style.display='none';
+  document.getElementById('runnerMenu').style.display='';
+  renderRunnerLeaderboard();
 }
 
-function playSong(songId) {
-  const song = SONGS.find(s => s.id === songId);
-  if (!song) return;
+function gameOverRunner(){
+  RN.running=false;
+  if(RN.raf) cancelAnimationFrame(RN.raf);
+  if(RN.spawnTimer) clearTimeout(RN.spawnTimer);
+  if(RN.optionTimer) clearTimeout(RN.optionTimer);
+  saveRunnerScore(RN.mode, RN.score);
+  addXP(Math.floor(RN.score/5));
+  const best = getRunnerScores()[0]?.score||0;
+  const isNew = RN.score>0 && RN.score>=best;
+  const parts = RN.mode.split('-');
+  const kType = parts[0];
+  const diff  = parts.slice(1).join('-');
+  showRunnerOverlay(`
+    <div style="font-size:3rem">${isNew?'🏆':'💀'}</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--pink);margin:4px 0">${isNew?'New Record!':'Game Over!'}</div>
+    <div style="font-size:1.4rem;color:var(--yellow);font-weight:700">${RN.score} แต้ม</div>
+    <div style="font-size:0.85rem;color:var(--text2);margin-bottom:12px">Combo สูงสุด: ${RN.combo}x</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-primary" onclick="startRunner('${kType}','${diff}')">🔄 เล่นอีก</button>
+      <button class="btn btn-outline" onclick="stopRunner()">🏠 หน้าหลัก</button>
+    </div>`);
+}
 
-  if (songIsPlaying) { stopAllSongs(); if (currentSongId === songId) return; }
+// ── Obstacle Spawning ──
+function scheduleNextObstacle(ms){
+  if(!RN.running) return;
+  RN.spawnTimer = setTimeout(()=>{
+    if(!RN.running) return;
+    spawnObstacle();
+    const nextMs = Math.max(1400, ms - RN.score*1.5);
+    scheduleNextObstacle(nextMs);
+  }, ms + (Math.random()-0.5)*400);
+}
 
-  currentSongId = songId;
-  songIsPlaying = true;
-  speechQueue = [];
-  speechBusy = false;
-  window.speechSynthesis.cancel();
+function spawnObstacle(){
+  if(!RN.running) return;
+  if(!RN.kanaPool.length) RN.kanaPool = shuffle([...RUNNER_MODES[RN.mode].data()]);
+  const kana = RN.kanaPool.pop();
+  RN.currentKana = kana;
+  RN.answerLocked = false;
+  RN.obstacles.push({ x:RN.canvas.width+20, kana, width:54, height:68, hit:false, passed:false });
+  showRunnerOptions(kana);
+}
 
-  // อัปเดต UI
-  document.querySelectorAll('.song-card').forEach(c => c.classList.remove('playing'));
-  const card = document.getElementById('sc_' + songId);
-  if (card) card.classList.add('playing');
-  const playBtn = document.getElementById('spb_' + songId);
-  if (playBtn) { playBtn.textContent = '⏹ หยุดเพลง'; playBtn.classList.add('stop'); }
+// ── Answer Options ──
+function showRunnerOptions(correctKana){
+  const allData = RUNNER_MODES[RN.mode].data();
+  const wrongs  = shuffle(allData.filter(c=>c.romaji!==correctKana.romaji)).slice(0,3);
+  const opts    = shuffle([correctKana,...wrongs]);
+  const el = document.getElementById('runnerOptions');
+  if(!el) return;
+  el.innerHTML = opts.map(o=>`
+    <button class="runner-opt" onclick="answerRunner('${o.romaji.replace(/'/g,"\\'")}','${correctKana.romaji.replace(/'/g,"\\'")}',this)">
+      <div style="font-size:1.3rem;font-family:'Noto Sans JP',sans-serif">${o.char}</div>
+      <div style="font-size:0.7rem;color:var(--text2)">${o.thai}</div>
+      <div class="opt-timer" style="width:100%"></div>
+    </button>`).join('');
 
-  // รีเซ็ต lyric และ char UI
-  document.querySelectorAll(`#lyr_${songId} .lyric-line`).forEach(el => el.classList.remove('active'));
-  document.querySelectorAll(`#chars_${songId} .song-char-pill`).forEach(el => el.classList.remove('active'));
+  const timeLimit = Math.max(1800, 3200 - RN.score*8);
+  el.querySelectorAll('.opt-timer').forEach(bar=>{
+    bar.style.transition=`width ${timeLimit}ms linear`;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ bar.style.width='0%'; }));
+  });
+  if(RN.optionTimer) clearTimeout(RN.optionTimer);
+  RN.optionTimer = setTimeout(()=>{
+    if(RN.running && !RN.answerLocked) autoMissRunner();
+  }, timeLimit);
+}
 
-  const ctx = getAudioCtx();
-  const audioStart = ctx.currentTime + 0.15;
-  const wallStart = Date.now() + 150;
-
-  // ===== ประมวล steps ทั้งหมดจาก song.steps =====
-  song.steps.forEach(step => {
-    if (step.type === 'note') {
-      // schedule ด้วย Web Audio (precise)
-      const t = audioStart + step.delay / 1000;
-      playNote(step.freq, step.dur, t);
-
-    } else if (step.type === 'highlight') {
-      // setTimeout สำหรับ UI (ยอมรับ ~10ms jitter ของ setTimeout ได้)
-      const t = setTimeout(() => {
-        if (!songIsPlaying) return;
-        document.querySelectorAll(`#chars_${songId} .song-char-pill`).forEach((el, j) => {
-          el.classList.toggle('active', j === step.index);
-        });
-      }, step.delay);
-      songTimeouts.push(t);
-
-    } else if (step.type === 'speak') {
-      // ใส่ queue พูด
-      enqueueSpeech(step.char, step.delay);
-
-    } else if (step.type === 'lyric') {
-      const t = setTimeout(() => {
-        if (!songIsPlaying) return;
-        document.querySelectorAll(`#lyr_${songId} .lyric-line`).forEach((el, j) => {
-          el.classList.toggle('active', j === step.index);
-        });
-      }, step.delay);
-      songTimeouts.push(t);
+function answerRunner(chosen, correct, btn){
+  if(RN.answerLocked||!RN.running) return;
+  RN.answerLocked = true;
+  if(RN.optionTimer) clearTimeout(RN.optionTimer);
+  const isCorrect = chosen===correct;
+  btn.classList.add(isCorrect?'correct':'wrong');
+  document.querySelectorAll('.runner-opt').forEach(b=>{
+    b.style.pointerEvents='none';
+    if(b.querySelector('div')?.textContent && isCorrect===false){
+      // highlight correct answer among options
+    }
+  });
+  // find and highlight the correct button
+  document.querySelectorAll('.runner-opt').forEach(b=>{
+    const charEl = b.querySelector('div[style*="Noto"]') || b.querySelector('div');
+    if(charEl){
+      const kanaMatch = RUNNER_MODES[RN.mode].data().find(k=>k.char===charEl.textContent.trim() && k.romaji===correct);
+      if(kanaMatch) b.classList.add('correct');
     }
   });
 
-  // เริ่ม speech queue หลังจาก steps ถูก enqueue ครบ
-  processSpeechQueue(wallStart);
-
-  // จบเพลง
-  const endT = setTimeout(() => stopAllSongs(), song.totalMs);
-  songTimeouts.push(endT);
-
-  // visualizer
-  startVisualizer(songId);
-  addXP(5);
+  if(isCorrect){
+    RN.combo++;
+    const pts = 10+Math.min(RN.combo*3,30);
+    RN.score += pts;
+    playerJumpRunner();
+    spawnScorePopup('+'+pts+(RN.combo>2?' 🔥'+RN.combo+'x':''), true);
+    const obs = RN.obstacles.find(o=>!o.passed&&!o.hit);
+    if(obs) obs.passed=true;
+    if(state.settings.audio) speakJapanese(RN.currentKana?.char||'');
+    addXP(3);
+  } else {
+    RN.combo=0; RN.hp--;
+    spawnScorePopup('ผิด! −HP', false);
+    const obs = RN.obstacles.find(o=>!o.passed&&!o.hit);
+    if(obs) obs.hit=true;
+    RN.canvasShake=10;
+    if(RN.hp<=0){ setTimeout(gameOverRunner,600); }
+  }
+  updateRunnerHUD();
+  setTimeout(()=>{ RN.answerLocked=false; }, 600);
 }
 
-function animateLyrics(songId, song) {} // unused — handled in playSong steps
-function animateChars(songId, song) {}   // unused — handled in playSong steps
-
-function startVisualizer(songId) {
-  const visEl = document.getElementById('vis_' + songId);
-  if (!visEl) return;
-  const bars = visEl.querySelectorAll('.vis-bar');
-  beatInterval = setInterval(() => {
-    bars.forEach(bar => {
-      const h = Math.random() * 24 + 4;
-      bar.style.height = h + 'px';
-    });
-  }, 100);
-  songTimeouts.push(beatInterval);
+function autoMissRunner(){
+  if(RN.answerLocked||!RN.running) return;
+  RN.answerLocked=true;
+  RN.combo=0; RN.hp--;
+  spawnScorePopup('หมดเวลา! −HP', false);
+  const obs = RN.obstacles.find(o=>!o.passed&&!o.hit);
+  if(obs) obs.hit=true;
+  RN.canvasShake=10;
+  updateRunnerHUD();
+  if(RN.hp<=0){ setTimeout(gameOverRunner,600); return; }
+  setTimeout(()=>{ RN.answerLocked=false; }, 600);
 }
 
-function stopAllSongs() {
-  songIsPlaying = false;
-  songTimeouts.forEach(t => clearTimeout(t));
-  if (beatInterval) clearInterval(beatInterval);
-  songTimeouts = [];
-  beatInterval = null;
+function playerJumpRunner(){
+  if(RN.player.jumping) return;
+  RN.player.jumping=true;
+  RN.player.vy = -(RN.canvas.height*0.048);
+}
 
-  // หยุดเสียงพูดทันที
-  try { window.speechSynthesis.cancel(); } catch(e) {}
+function spawnScorePopup(text, good){
+  RN.scorePopups.push({ text, good, x:RN.player.x+40, y:RN.player.y-30, life:1.0 });
+}
 
-  // reset visualizers
-  document.querySelectorAll('.vis-bar').forEach(b => b.style.height = '4px');
-  document.querySelectorAll('.lyric-line').forEach(l => l.classList.remove('active'));
-  document.querySelectorAll('.song-char-pill').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.song-card').forEach(c => c.classList.remove('playing'));
-  document.querySelectorAll('.song-play-btn').forEach(b => {
-    b.classList.remove('stop');
-    b.textContent = '▶ ฟังเพลง + ร้องตาม';
+// ── Game Loop ──
+function runnerLoop(){
+  if(!RN.running) return;
+  RN.raf = requestAnimationFrame(runnerLoop);
+  RN.frameCount++;
+  const cv=RN.canvas, cx=RN.ctx, W=cv.width, H=cv.height, G=RN.ground;
+  const GRAVITY = H*0.0042;
+  const spd = RN.speed + RN.score*0.003;
+
+  let sx=0, sy=0;
+  if(RN.canvasShake>0){ sx=(Math.random()-.5)*6; sy=(Math.random()-.5)*4; RN.canvasShake--; }
+  cx.save(); cx.translate(sx,sy);
+
+  drawRunnerBG(cx,W,H,G);
+
+  // Physics
+  if(RN.player.jumping){
+    RN.player.vy += GRAVITY;
+    RN.player.y  += RN.player.vy;
+    if(RN.player.y>=G){ RN.player.y=G; RN.player.vy=0; RN.player.jumping=false; }
+  }
+  RN.player.frame++;
+  drawRunnerPlayer(cx, RN.player);
+
+  // Obstacles
+  RN.obstacles.forEach(obs=>{ obs.x-=spd; drawRunnerObstacle(cx,obs,G); });
+  RN.obstacles = RN.obstacles.filter(o=>o.x>-100);
+
+  // Score popups
+  cx.textAlign='center';
+  RN.scorePopups.forEach(p=>{
+    p.y-=1.2; p.life-=0.025;
+    cx.globalAlpha=Math.max(0,p.life);
+    cx.font='bold 13px "Noto Sans Thai",sans-serif';
+    cx.fillStyle=p.good?'#69f0ae':'#ff5252';
+    cx.fillText(p.text, p.x, p.y);
   });
+  cx.globalAlpha=1;
+  RN.scorePopups=RN.scorePopups.filter(p=>p.life>0);
 
-  if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
-  currentSongId = null;
+  // Score HUD on canvas
+  cx.font='bold 15px "Fredoka One",cursive';
+  cx.fillStyle='rgba(255,255,255,0.4)';
+  cx.textAlign='right';
+  cx.fillText(RN.score, W-10, 22);
+
+  RN.bgX-=spd*0.4; RN.cloudX-=spd*0.15;
+  cx.restore();
 }
 
-// ===== RENDER SONGS =====
-function renderSongs(filter = 'all') {
-  const list = document.getElementById('songList');
-  if (!list) return;
-  const filtered = filter === 'all' ? SONGS : SONGS.filter(s => s.script === filter);
-  list.innerHTML = filtered.map(song => `
-    <div class="song-card" id="sc_${song.id}">
-      <div class="song-mode-badge">🎵 Melody Memory</div>
-      <div class="song-card-header">
-        <div class="song-icon" style="background:linear-gradient(135deg,${song.color},${song.color}88)">${song.icon}</div>
-        <div>
-          <div class="song-title">${song.title}</div>
-          <div class="song-desc">${song.desc}</div>
-        </div>
-      </div>
-
-      <div class="song-chars" id="chars_${song.id}">
-        ${song.chars.map(c => `
-          <div class="song-char-pill">
-            <span style="font-family:'Noto Sans JP',sans-serif;font-size:1rem">${c.char}</span>
-            <span class="pill-romaji">${c.romaji}</span>
-          </div>
-        `).join('')}
-      </div>
-
-      <div class="visualizer" id="vis_${song.id}">
-        ${Array(12).fill(0).map(() => `<div class="vis-bar" style="height:4px"></div>`).join('')}
-      </div>
-
-      <div class="song-lyrics" id="lyr_${song.id}">
-        ${song.lyrics.map((l, i) => `<div class="lyric-line" id="ll_${song.id}_${i}">${l}</div>`).join('')}
-      </div>
-
-      <button class="song-play-btn" id="spb_${song.id}" onclick="playSong('${song.id}')">
-        ▶ ฟังเพลง + ร้องตาม
-      </button>
-    </div>
-  `).join('');
+// ── Draw BG ──
+function drawRunnerBG(cx,W,H,G){
+  const sky=cx.createLinearGradient(0,0,0,G);
+  sky.addColorStop(0,'#0d0d22'); sky.addColorStop(1,'#1a1a3e');
+  cx.fillStyle=sky; cx.fillRect(0,0,W,H);
+  // Stars
+  cx.fillStyle='rgba(255,255,255,0.7)';
+  for(let i=0;i<28;i++){
+    const sx=((i*137+RN.bgX*0.3)%W+W)%W;
+    const sy=(i*79)%(G*0.85);
+    cx.beginPath(); cx.arc(sx,sy,i%3===0?1.5:0.7,0,Math.PI*2); cx.fill();
+  }
+  // Clouds
+  cx.fillStyle='rgba(255,255,255,0.04)';
+  for(let i=0;i<3;i++){
+    const cx2=((i*200+RN.cloudX)%W+W)%W;
+    cx.beginPath(); cx.ellipse(cx2,18+i*18,38+i*10,14,0,0,Math.PI*2); cx.fill();
+  }
+  // Ground fill
+  const grd=cx.createLinearGradient(0,G,0,H);
+  grd.addColorStop(0,'#2a1f5e'); grd.addColorStop(1,'#150d35');
+  cx.fillStyle=grd; cx.fillRect(0,G,W,H-G);
+  // Ground glow line
+  cx.save();
+  cx.shadowColor='#b39ddb'; cx.shadowBlur=8;
+  cx.strokeStyle='rgba(179,157,219,0.6)'; cx.lineWidth=2;
+  cx.beginPath(); cx.moveTo(0,G); cx.lineTo(W,G); cx.stroke();
+  cx.restore();
+  // Moving grid
+  cx.strokeStyle='rgba(179,157,219,0.1)'; cx.lineWidth=1;
+  for(let i=0;i<10;i++){
+    const lx=((i*60-RN.bgX*0.8)%W+W)%W;
+    cx.beginPath(); cx.moveTo(lx,G); cx.lineTo(lx-22,H); cx.stroke();
+  }
 }
 
-function filterSongs(filter, btn) {
-  document.querySelectorAll('#songFilter .type-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  stopAllSongs();
-  renderSongs(filter);
+// ── Draw Player (ฮารุนะ) ──
+function drawRunnerPlayer(cx, p){
+  const bob = p.jumping?0:Math.sin(p.frame*0.18)*2;
+  const leg  = p.jumping?0:Math.sin(p.frame*0.22)*8;
+  cx.save(); cx.translate(p.x, p.y+bob);
+  // Shadow
+  cx.fillStyle='rgba(0,0,0,0.22)';
+  cx.beginPath(); cx.ellipse(16,2,14,4,0,0,Math.PI*2); cx.fill();
+  // Body glow
+  cx.shadowColor='#ff6b9d'; cx.shadowBlur=14;
+  // Body
+  cx.fillStyle='#ff6b9d';
+  cx.beginPath(); cx.roundRect(4,-42,24,28,7); cx.fill();
+  // Head
+  cx.fillStyle='#ffccdd';
+  cx.beginPath(); cx.arc(16,-53,13,0,Math.PI*2); cx.fill();
+  cx.shadowBlur=0;
+  // Eyes
+  cx.fillStyle='#333';
+  cx.beginPath(); cx.arc(12,-55,2.5,0,Math.PI*2); cx.fill();
+  cx.beginPath(); cx.arc(20,-55,2.5,0,Math.PI*2); cx.fill();
+  // Cheeks
+  cx.fillStyle='rgba(255,107,157,0.4)';
+  cx.beginPath(); cx.arc(9,-51,3,0,Math.PI*2); cx.fill();
+  cx.beginPath(); cx.arc(23,-51,3,0,Math.PI*2); cx.fill();
+  // Smile
+  cx.strokeStyle='#555'; cx.lineWidth=1.5;
+  cx.beginPath(); cx.arc(16,-50,4,0.2,Math.PI-0.2); cx.stroke();
+  // Hair
+  cx.fillStyle='#ff4d8d';
+  cx.beginPath(); cx.arc(5,-60,5,0,Math.PI*2); cx.fill();
+  cx.beginPath(); cx.arc(27,-60,5,0,Math.PI*2); cx.fill();
+  cx.beginPath(); cx.arc(16,-64,6,0,Math.PI*2); cx.fill();
+  // Legs
+  cx.strokeStyle='#b39ddb'; cx.lineWidth=5; cx.lineCap='round';
+  cx.beginPath(); cx.moveTo(10,-14); cx.lineTo(10+leg*0.5,0); cx.stroke();
+  cx.beginPath(); cx.moveTo(22,-14); cx.lineTo(22-leg*0.5,0); cx.stroke();
+  cx.restore();
 }
 
+// ── Draw Obstacle Wall ──
+function drawRunnerObstacle(cx, obs, G){
+  const {x,width:w,height:h,passed,hit,kana} = obs;
+  const color = passed?'#69f0ae': hit?'#ff5252':'#4fc3f7';
+  cx.save();
+  if(hit) cx.globalAlpha=0.45;
+  cx.shadowColor=color; cx.shadowBlur=16;
+  // Wall fill
+  cx.fillStyle = passed?'rgba(105,240,174,0.18)': hit?'rgba(255,82,82,0.28)':'rgba(79,195,247,0.18)';
+  cx.strokeStyle=color; cx.lineWidth=2;
+  cx.beginPath(); cx.roundRect(x,G-h,w,h,8); cx.fill(); cx.stroke();
+  cx.shadowBlur=0;
+  // Kana char
+  if(!passed && !hit){
+    const fs = Math.round(w*0.58);
+    cx.font=`bold ${fs}px "Noto Sans JP",sans-serif`;
+    cx.fillStyle='#ffffff';
+    cx.textAlign='center'; cx.textBaseline='middle';
+    cx.fillText(kana.char, x+w/2, G-h/2-4);
+    // romaji tiny
+    cx.font=`${Math.round(w*0.21)}px sans-serif`;
+    cx.fillStyle='rgba(255,255,255,0.45)';
+    cx.fillText(kana.romaji, x+w/2, G-10);
+  }
+  cx.restore();
+}
 
+// ── HUD & Overlay ──
+function updateRunnerHUD(){
+  const g=id=>document.getElementById(id);
+  if(g('runScore'))  g('runScore').textContent  = RN.score;
+  if(g('runCombo'))  g('runCombo').textContent  = RN.combo>0 ? RN.combo+'x' : '0x';
+  if(g('runHp'))     g('runHp').textContent     = '❤️'.repeat(Math.max(0,RN.hp))+'🖤'.repeat(Math.max(0,3-RN.hp));
+  const best = getRunnerScores().find(s=>s.mode===RN.mode)?.score||0;
+  if(g('runBest'))   g('runBest').textContent   = best;
+  if(g('runnerProgFill')) g('runnerProgFill').style.width = Math.min(RN.score/2,100)+'%';
+}
+function showRunnerOverlay(html){
+  const ov=document.getElementById('runnerOverlay');
+  if(!ov) return;
+  document.getElementById('runnerOverlayContent').innerHTML=html;
+  ov.style.display='flex';
+}
+function hideRunnerOverlay(){
+  const ov=document.getElementById('runnerOverlay');
+  if(ov) ov.style.display='none';
+  const ro=document.getElementById('runnerOptions');
+  if(ro) ro.innerHTML='';
+}
+
+// =====================================================
 function resetProgress() {
   if(confirm('ต้องการรีเซ็ตความก้าวหน้าทั้งหมดใช่ไหม? (ไม่สามารถเรียกคืนได้)')) {
     localStorage.removeItem('harunaState');
